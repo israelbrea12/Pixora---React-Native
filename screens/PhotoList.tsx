@@ -1,7 +1,6 @@
-// src/screens/PhotoList.tsx
-
 import React, { Component } from 'react';
-import { StyleSheet, FlatList, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { FlashList } from "@shopify/flash-list";
 import UnsplashApiClient, { Photo } from '../api/UnsplashApiClient';
 import PhotoGridItem from '../components/PhotoGridItem';
 import { HomeScreenProps, SearchScreenProps } from '../navigation/types';
@@ -17,7 +16,6 @@ export interface PhotoListState {
     photos: ReadonlyArray<PhotoEntry>;
 }
 
-
 export default abstract class PhotoList<
     P extends PhotoListNavProps = PhotoListNavProps,
     S extends PhotoListState = PhotoListState
@@ -31,8 +29,6 @@ export default abstract class PhotoList<
         super(props);
         this.state = { photos: [] } as unknown as S;
     }
-
-    // ... el resto del fichero se queda igual ...
 
     public componentDidMount() {
         if (this.state.photos.length === 0) {
@@ -77,13 +73,14 @@ export default abstract class PhotoList<
         return (
             <View style={styles.container}>
                 {this.renderHeader()}
-                <FlatList
+                <FlashList
                     data={this.state.photos}
+                    masonry
                     renderItem={this.renderGridItem.bind(this)}
+                    keyExtractor={item => item.key}
+                    numColumns={2}
                     onEndReached={() => this.loadNextPage()}
                     onEndReachedThreshold={0.5}
-                    numColumns={2}
-                    keyExtractor={item => item.key}
                 />
             </View>
         );
