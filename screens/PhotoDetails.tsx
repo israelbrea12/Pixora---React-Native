@@ -1,43 +1,31 @@
+// src/screens/PhotoDetails.tsx
+
 import React, { Component } from 'react';
-import {
-    StyleSheet,
-    Text,
-    View,
-    ScrollView,
-    Image,
-    ActivityIndicator,
-} from 'react-native';
-
+import { StyleSheet, Text, View, ScrollView, Image, ActivityIndicator } from 'react-native';
 import UnsplashApiClient, { Photo } from '../api/UnsplashApiClient';
+// --- CAMBIO: Importamos el tipo de props desde nuestro nuevo fichero ---
+import { PhotoDetailsScreenProps } from '../navigation/types';
 
-interface PhotoDetailsProps {
-    navigation: any;
-    route: {
-        params: {
-            photo: Photo;
-        };
-    };
-}
+// La interfaz 'PhotoDetailsProps' ya no es necesaria, la reemplazamos por PhotoDetailsScreenProps.
 
 interface PhotoDetailsState {
     photo: Photo;
     isLoading: boolean;
 }
 
-export default class PhotoDetails extends Component<
-    PhotoDetailsProps,
-    PhotoDetailsState
-> {
+// --- CAMBIO: Usamos el nuevo tipo de props ---
+export default class PhotoDetails extends Component<PhotoDetailsScreenProps, PhotoDetailsState> {
     private apiClient: UnsplashApiClient = new UnsplashApiClient();
     private photoID: string;
 
-    public constructor(props: PhotoDetailsProps) {
+    public constructor(props: PhotoDetailsScreenProps) {
         super(props);
+        // Ahora 'route.params' está fuertemente tipado. ¡No más 'any'!
         const { photo } = props.route.params;
         this.photoID = photo.id;
 
         this.state = {
-            photo: photo, // Mostramos la info básica mientras carga la completa
+            photo: photo,
             isLoading: true,
         };
 
@@ -46,6 +34,7 @@ export default class PhotoDetails extends Component<
         });
     }
 
+    // ...el resto del componente no cambia...
     public componentDidMount() {
         this.apiClient
             .getPhotoDetails(this.photoID)

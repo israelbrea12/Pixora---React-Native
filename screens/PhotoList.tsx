@@ -4,25 +4,22 @@ import React, { Component } from 'react';
 import { StyleSheet, FlatList, View } from 'react-native';
 import UnsplashApiClient, { Photo } from '../api/UnsplashApiClient';
 import PhotoGridItem from '../components/PhotoGridItem';
+import { HomeScreenProps, SearchScreenProps } from '../navigation/types';
 
 type PhotoEntry = {
     key: string;
     photo: Photo;
 };
 
-export interface PhotoListProps {
-    navigation: any;
-}
+type PhotoListNavProps = HomeScreenProps | SearchScreenProps;
 
-// Este es el "contrato" base del estado. Todas las clases hijas deben tener, como mínimo, 'photos'.
 export interface PhotoListState {
     photos: ReadonlyArray<PhotoEntry>;
 }
 
-// Aceptará un tipo para Props (P) y un tipo para State (S).
-// Forzamos a que el estado 'S' sea siempre una extensión de 'PhotoListState'.
+
 export default abstract class PhotoList<
-    P extends PhotoListProps = PhotoListProps,
+    P extends PhotoListNavProps = PhotoListNavProps,
     S extends PhotoListState = PhotoListState
 > extends Component<P, S> {
     protected apiClient: UnsplashApiClient = new UnsplashApiClient();
@@ -32,12 +29,15 @@ export default abstract class PhotoList<
 
     public constructor(props: P) {
         super(props);
-        // Le decimos a TypeScript: "Confía en mí, el estado inicial es compatible con S".
         this.state = { photos: [] } as unknown as S;
     }
 
+    // ... el resto del fichero se queda igual ...
+
     public componentDidMount() {
-        this.loadNextPage();
+        if (this.state.photos.length === 0) {
+            this.loadNextPage();
+        }
     }
 
     public loadNextPage() {
@@ -56,7 +56,6 @@ export default abstract class PhotoList<
                     key: photo.id,
                     photo: photo,
                 }));
-                // Usamos un callback en setState para asegurar que el estado se concatena correctamente
                 this.setState(prevState => ({
                     ...prevState,
                     photos: [...prevState.photos, ...photoEntries],

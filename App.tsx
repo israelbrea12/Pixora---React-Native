@@ -1,118 +1,142 @@
 // App.tsx
 
-import React, { Component, JSX } from 'react';
-import { Platform, View } from 'react-native';
+import React, { Component } from 'react';
+import { View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 
-// Importamos los nuevos componentes
-import NewPhotosList from './screens/NewPhotosList';
+// --- CAMBIO: Importamos los tipos de ParamList ---
+import { MainStackParamList, PlaceholderStackParamList } from './navigation/types';
+
+import HomeScreen from './screens/HomeScreen';
 import SearchPhotosList from './screens/SearchPhotosList';
 import PhotoDetails from './screens/PhotoDetails';
+import PlaceholderScreen from './screens/PlaceholderScreen';
 
-const Stack = createNativeStackNavigator();
+// --- CAMBIO: Aplicamos los tipos a los navegadores ---
+const MainStack = createNativeStackNavigator<MainStackParamList>();
+const PlaceholderStack = createNativeStackNavigator<PlaceholderStackParamList>();
 const Tab = createBottomTabNavigator();
 
+// Stacks para las pestañas principales
+const HomeStack = () => (
+  <MainStack.Navigator>
+    <MainStack.Screen name="home" component={HomeScreen} options={{ title: 'Pixora' }} />
+    <MainStack.Screen name="photoDetails" component={PhotoDetails} />
+  </MainStack.Navigator>
+);
+
+const SearchStack = () => (
+  <MainStack.Navigator>
+    <MainStack.Screen name="searchList" component={SearchPhotosList} options={{ title: 'Buscar' }} />
+    <MainStack.Screen name="photoDetails" component={PhotoDetails} />
+  </MainStack.Navigator>
+);
+
+// Stacks para las pantallas placeholder
+const AddStack = () => (
+  <PlaceholderStack.Navigator>
+    <PlaceholderStack.Screen name="add" component={PlaceholderScreen} initialParams={{ title: 'Añadir' }} options={{ title: 'Añadir' }} />
+  </PlaceholderStack.Navigator>
+);
+
+const ActivityStack = () => (
+  <PlaceholderStack.Navigator>
+    <PlaceholderStack.Screen name="activity" component={PlaceholderScreen} initialParams={{ title: 'Actividad' }} options={{ title: 'Actividad' }} />
+  </PlaceholderStack.Navigator>
+);
+
+const SettingsStack = () => (
+  <PlaceholderStack.Navigator>
+    <PlaceholderStack.Screen name="settings" component={PlaceholderScreen} initialParams={{ title: 'Ajustes' }} options={{ title: 'Ajustes' }} />
+  </PlaceholderStack.Navigator>
+);
+
+
 interface AppState {
-  ready: boolean;
+  initialRouteName: string | null;
 }
 
-interface AppProps { }
+export default class App extends Component<{}, AppState> {
 
-export default class App extends Component<AppProps, AppState> {
-  private newPhotosStack!: () => JSX.Element;
-  private searchPhotosStack!: () => JSX.Element;
-  private mainTab!: () => JSX.Element;
-  private navigationContainer!: () => JSX.Element;
-
-  public constructor(props: AppProps) {
+  public constructor(props: {}) {
     super(props);
     this.state = {
-      ready: false,
+      initialRouteName: null,
     };
   }
 
-  public async componentDidMount() {
+  public componentDidMount() {
     AsyncStorage.getItem('lastSelectedTab').then(lastSelectedTab => {
-      this.createMainNavigation(lastSelectedTab);
+      this.setState({ initialRouteName: lastSelectedTab || 'HomeTab' });
     });
   }
 
-  private createMainNavigation(initialTab: string | null) {
-    if (initialTab === null) {
-      initialTab = 'newPhotos';
+  private handleTabPress = (tabName: string) => {
+    AsyncStorage.setItem('lastSelectedTab', tabName);
+  };
+
+  public render() {
+    if (this.state.initialRouteName === null) {
+      // Muestra una vista de carga mientras se obtiene la pestaña inicial
+      return <View />;
     }
 
-    this.newPhotosStack = () => {
-      return (
-        <Stack.Navigator>
-          <Stack.Screen name="photoList" component={NewPhotosList as any} />
-          <Stack.Screen name="photoDetails" component={PhotoDetails as any} />
-        </Stack.Navigator>
-      );
-    };
-
-    this.searchPhotosStack = () => {
-      return (
-        <Stack.Navigator>
-          <Stack.Screen name="searchList" component={SearchPhotosList as any} />
-          <Stack.Screen name="photoDetails" component={PhotoDetails as any} />
-        </Stack.Navigator>
-      );
-    };
-
-    this.mainTab = () => {
-      const tabBarOnPress = (tabName: string) => {
-        return () => {
-          AsyncStorage.setItem('lastSelectedTab', tabName);
-        };
-      };
-
-      return (
-        <Tab.Navigator initialRouteName={initialTab}>
+    return (
+      <NavigationContainer>
+        <Tab.Navigator
+          initialRouteName={this.state.initialRouteName}
+          screenOptions={{ headerShown: false }}>
           <Tab.Screen
-            name="newPhotos"
-            component={this.newPhotosStack}
-            listeners={{ tabPress: tabBarOnPress('newPhotos') }}
+            name="HomeTab"
+            component={HomeStack}
+            listeners={{ tabPress: () => this.handleTabPress('HomeTab') }}
             options={{
-              headerShown: false,
-              tabBarLabel: 'Novedades',
-              tabBarIcon: ({ color, size }) => (
-                <Ionicon name="sparkles" size={size} color={color} />
-              ),
+              tabBarLabel: 'Inicio',
+              tabBarIcon: ({ color, size }) => <Ionicon name="home" size={size} color={color} />,
             }}
           />
           <Tab.Screen
-            name="searchPhotos"
-            component={this.searchPhotosStack}
-            listeners={{ tabPress: tabBarOnPress('searchPhotos') }}
+            name="SearchTab"
+            component={SearchStack}
+            listeners={{ tabPress: () => this.handleTabPress('SearchTab') }}
             options={{
-              headerShown: false,
               tabBarLabel: 'Buscar',
-              tabBarIcon: ({ color, size }) => (
-                <Ionicon name="search" size={size} color={color} />
-              ),
+              tabBarIcon: ({ color, size }) => <Ionicon name="search" size={size} color={color} />,
+            }}
+          />
+          <Tab.Screen
+            name="AddTab"
+            component={AddStack}
+            listeners={{ tabPress: () => this.handleTabPress('AddTab') }}
+            options={{
+              tabBarLabel: 'Añadir',
+              tabBarIcon: ({ color, size }) => <Ionicon name="add-circle" size={size} color={color} />,
+            }}
+          />
+          <Tab.Screen
+            name="ActivityTab"
+            component={ActivityStack}
+            listeners={{ tabPress: () => this.handleTabPress('ActivityTab') }}
+            options={{
+              tabBarLabel: 'Actividad',
+              tabBarIcon: ({ color, size }) => <Ionicon name="heart" size={size} color={color} />,
+            }}
+          />
+          <Tab.Screen
+            name="SettingsTab"
+            component={SettingsStack}
+            listeners={{ tabPress: () => this.handleTabPress('SettingsTab') }}
+            options={{
+              tabBarLabel: 'Ajustes',
+              tabBarIcon: ({ color, size }) => <Ionicon name="settings" size={size} color={color} />,
             }}
           />
         </Tab.Navigator>
-      );
-    };
-
-    this.navigationContainer = () => {
-      return (
-        <NavigationContainer>
-          <this.mainTab />
-        </NavigationContainer>
-      );
-    };
-
-    this.setState({ ready: true });
-  }
-
-  public render() {
-    return this.state.ready ? <this.navigationContainer /> : <View />;
+      </NavigationContainer>
+    );
   }
 }

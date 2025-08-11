@@ -2,42 +2,46 @@
 
 import React from 'react';
 import { TextInput, StyleSheet, View } from 'react-native';
-// --- CAMBIO 1: Importamos también PhotoListState ---
-import PhotoList, { PhotoListProps, PhotoListState } from './PhotoList';
+import PhotoList, { PhotoListState } from './PhotoList';
 import { Photo } from '../api/UnsplashApiClient';
+// --- CAMBIO 1: Importamos el tipo de props específico para esta pantalla ---
+import { SearchScreenProps } from '../navigation/types';
 
-// --- CAMBIO 2: Creamos un nuevo estado que extiende el del padre ---
 interface SearchablePhotoListState extends PhotoListState {
     query: string;
 }
 
-// --- CAMBIO 3: Le pasamos nuestro nuevo estado a la clase padre genérica ---
-export default class SearchPhotosList extends PhotoList<PhotoListProps, SearchablePhotoListState> {
-
-    // --- CAMBIO 4: Definimos el estado inicial completo como una propiedad de clase ---
+// --- CAMBIO 2: Le decimos a la clase que usará SearchScreenProps ---
+export default class SearchPhotosList extends PhotoList<SearchScreenProps, SearchablePhotoListState> {
     public state: SearchablePhotoListState = {
-        photos: [], // la propiedad que requiere el padre
-        query: '',  // nuestra nueva propiedad
+        photos: [],
+        query: '',
     };
 
-    public constructor(props: PhotoListProps) {
+    // --- CAMBIO 3: El constructor ahora espera recibir SearchScreenProps ---
+    public constructor(props: SearchScreenProps) {
         super(props);
+        // Ya no es necesario setOptions aquí si lo pones en App.tsx, pero lo dejamos por si acaso.
         props.navigation.setOptions({
             title: 'Buscar',
         });
     }
 
-    protected loadPage(page: number): Promise<{ photos: ReadonlyArray<Photo>, totalPages: number }> {
+    protected loadPage(page: number): Promise<{ photos: ReadonlyArray<Photo>; totalPages: number }> {
         return this.apiClient.searchPhotos(this.state.query, page);
     }
 
     private handleSearch = () => {
         this.nextPage = 1;
         this.totalPages = 1;
-        this.setState({ photos: [] } as any, () => { // Usamos 'as any' aquí porque 'photos' no es el estado completo
-            this.loadNextPage();
-        });
-    }
+        // --- CAMBIO 4: Usamos la forma funcional y segura de setState, eliminando 'as any' ---
+        this.setState(
+            prevState => ({ ...prevState, photos: [] }), // Solo limpiamos las fotos, mantenemos la query actual
+            () => {
+                this.loadNextPage();
+            }
+        );
+    };
 
     protected renderHeader(): React.ReactNode {
         return (
@@ -51,7 +55,7 @@ export default class SearchPhotosList extends PhotoList<PhotoListProps, Searchab
                     returnKeyType="search"
                 />
             </View>
-        )
+        );
     }
 }
 
