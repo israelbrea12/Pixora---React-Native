@@ -5,17 +5,20 @@ import { Photo } from '../api/UnsplashApiClient';
 
 // Define qué pantallas hay en los stacks principales y qué parámetros esperan.
 // 'undefined' significa que la pantalla no recibe parámetros.
+// Probablemente tengas algo así:
 export type MainStackParamList = {
     home: undefined;
     searchList: undefined;
-    photoDetails: { photo: Photo }; // La pantalla 'photoDetails' DEBE recibir un objeto 'photo'.
+    photoDetails: { photo: Photo };
+    // --- AÑADE LA NUEVA PANTALLA DE PERFIL AQUÍ ---
+    profile: undefined;
 };
 
-// Define qué pantallas y parámetros esperan los stacks que solo muestran un placeholder.
+// Y aquí, puedes eliminar la de settings si ya no la usarás para otra cosa
 export type PlaceholderStackParamList = {
     add: { title: string };
     activity: { title: string };
-    settings: { title: string };
+    settings: { title: string }; // <-- Esta línea podría quedarse o irse
 };
 
 

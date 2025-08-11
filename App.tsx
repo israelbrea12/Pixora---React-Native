@@ -15,6 +15,7 @@ import HomeScreen from './screens/HomeScreen';
 import SearchPhotosList from './screens/SearchPhotosList';
 import PhotoDetails from './screens/PhotoDetails';
 import PlaceholderScreen from './screens/PlaceholderScreen';
+import ProfileScreen from './screens/ProfileScreen';
 
 // --- CAMBIO: Aplicamos los tipos a los navegadores ---
 const MainStack = createNativeStackNavigator<MainStackParamList>();
@@ -50,9 +51,19 @@ const ActivityStack = () => (
 );
 
 const SettingsStack = () => (
-  <PlaceholderStack.Navigator>
-    <PlaceholderStack.Screen name="settings" component={PlaceholderScreen} initialParams={{ title: 'Ajustes' }} options={{ title: 'Ajustes' }} />
-  </PlaceholderStack.Navigator>
+  <MainStack.Navigator>
+    <MainStack.Screen
+      name="profile" // Usamos el nombre que añadimos a MainStackParamList
+      component={ProfileScreen}
+      options={{ headerShown: false }}
+    />
+    {/* Y muy importante, le damos acceso a photoDetails */}
+    <MainStack.Screen
+      name="photoDetails"
+      component={PhotoDetails}
+      options={{ headerShown: false }}
+    />
+  </MainStack.Navigator>
 );
 
 
