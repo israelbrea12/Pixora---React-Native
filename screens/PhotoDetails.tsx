@@ -1,40 +1,46 @@
-// src/screens/PhotoDetails.tsx
-
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, ScrollView, Image, ActivityIndicator } from 'react-native';
+import {
+    StyleSheet,
+    Text,
+    View,
+    ScrollView,
+    Image,
+    ActivityIndicator,
+    TouchableOpacity,
+    SafeAreaView,
+    Dimensions
+} from 'react-native';
 import UnsplashApiClient, { Photo } from '../api/UnsplashApiClient';
-// --- CAMBIO: Importamos el tipo de props desde nuestro nuevo fichero ---
 import { PhotoDetailsScreenProps } from '../navigation/types';
+import Ionicon from 'react-native-vector-icons/Ionicons';
 
-// La interfaz 'PhotoDetailsProps' ya no es necesaria, la reemplazamos por PhotoDetailsScreenProps.
-
+// Estado local para la vista, incluyendo el estado de la UI
 interface PhotoDetailsState {
     photo: Photo;
     isLoading: boolean;
+    isFavorite: boolean; // Para simular si es favorito
+    isSaved: boolean;    // Para simular si está guardado
 }
 
-// --- CAMBIO: Usamos el nuevo tipo de props ---
 export default class PhotoDetails extends Component<PhotoDetailsScreenProps, PhotoDetailsState> {
     private apiClient: UnsplashApiClient = new UnsplashApiClient();
     private photoID: string;
 
     public constructor(props: PhotoDetailsScreenProps) {
         super(props);
-        // Ahora 'route.params' está fuertemente tipado. ¡No más 'any'!
         const { photo } = props.route.params;
         this.photoID = photo.id;
 
         this.state = {
             photo: photo,
             isLoading: true,
+            isFavorite: false, // Valor inicial para la demo
+            isSaved: false,    // Valor inicial para la demo
         };
 
-        props.navigation.setOptions({
-            title: photo.alt_description || 'Detalle de la foto',
-        });
+        // Ya no necesitamos setOptions para el título porque el header está oculto
     }
 
-    // ...el resto del componente no cambia...
     public componentDidMount() {
         this.apiClient
             .getPhotoDetails(this.photoID)
@@ -47,36 +53,52 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
             });
     }
 
-    public render() {
-        if (this.state.isLoading && !this.state.photo.urls.regular) {
-            return <ActivityIndicator size="large" style={styles.loader} />
-        }
+    // --- Funciones para simular interacciones ---
+    private toggleFavorite = () => {
+        this.setState(prevState => ({ isFavorite: !prevState.isFavorite }));
+    };
 
-        const { photo } = this.state;
-        const imageAspectRatio = photo.height / photo.width;
+    private toggleSaved = () => {
+        this.setState(prevState => ({ isSaved: !prevState.isSaved }));
+    };
 
+    // --- Sub-componentes de renderizado ---
+
+    private renderInteractionBar(photo: Photo) {
+        const { isFavorite, isSaved } = this.state;
         return (
-            <ScrollView contentContainerStyle={styles.container}>
-                <Image
-                    style={[styles.image, { aspectRatio: imageAspectRatio }]}
-                    source={{ uri: photo.urls.regular }}
-                    resizeMode="contain"
-                />
-                {this.renderPhotographerInfo(photo)}
-                {this.renderDescription(photo)}
-                {this.renderStats(photo)}
-            </ScrollView>
+            <View style={styles.interactionBar}>
+                {/* Sección de "Me gusta" */}
+                <View style={styles.likesContainer}>
+                    <TouchableOpacity onPress={this.toggleFavorite}>
+                        <Ionicon
+                            name={isFavorite ? 'heart' : 'heart-outline'}
+                            size={28}
+                            color={isFavorite ? '#E91E63' : '#333'}
+                        />
+                    </TouchableOpacity>
+                    <Text style={styles.likesText}>{photo.likes.toLocaleString()}</Text>
+                </View>
+
+                {/* Botón de Guardar */}
+                <TouchableOpacity
+                    onPress={this.toggleSaved}
+                    style={[styles.saveButton, isSaved && styles.saveButtonSaved]}
+                >
+                    <Text style={styles.saveButtonText}>{isSaved ? 'Guardado' : 'Guardar'}</Text>
+                </TouchableOpacity>
+            </View>
         );
     }
 
-    private renderPhotographerInfo(photo: Photo) {
+    private renderUserInfo(photo: Photo) {
         return (
-            <View style={styles.photographerContainer}>
+            <View style={styles.userInfoContainer}>
                 <Image
                     style={styles.photographerImage}
                     source={{ uri: photo.user.profile_image.medium }}
                 />
-                <View style={styles.photographerText}>
+                <View style={styles.photographerTextContainer}>
                     <Text style={styles.photographerName}>{photo.user.name}</Text>
                     <Text style={styles.photographerUsername}>@{photo.user.username}</Text>
                 </View>
@@ -87,62 +109,163 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
     private renderDescription(photo: Photo) {
         const description = photo.description || photo.alt_description;
         if (!description) return null;
-        return <Text style={styles.description}>{description}</Text>;
+
+        return (
+            <View style={styles.descriptionContainer}>
+                <Text style={styles.descriptionText}>{description}</Text>
+                <View style={styles.divider} />
+            </View>
+        );
     }
 
-    private renderStats(photo: Photo) {
+    public render() {
+        // Muestra un loader mientras se obtienen todos los detalles
+        if (this.state.isLoading && !this.state.photo.urls.regular) {
+            return <ActivityIndicator size="large" style={styles.loader} />;
+        }
+
+        const { photo } = this.state;
+
+        // Calculamos la altura de la imagen para que se ajuste al ancho de la pantalla
+        const imageWidth = Dimensions.get('window').width;
+        const imageHeight = (imageWidth * photo.height) / photo.width;
+
         return (
-            <View style={styles.statsContainer}>
-                <Text style={styles.statsText}>❤️ {photo.likes} Me gusta</Text>
-            </View>
-        )
+            <SafeAreaView style={styles.safeArea}>
+                <ScrollView>
+                    <View style={styles.container}>
+                        {/* Imagen principal */}
+                        <Image
+                            style={[styles.image, { height: imageHeight }]}
+                            source={{ uri: photo.urls.regular }}
+                        />
+
+                        {/* Barra de Interacción */}
+                        {this.renderInteractionBar(photo)}
+
+                        {/* Información del Fotógrafo */}
+                        {this.renderUserInfo(photo)}
+
+                        {/* Descripción */}
+                        {this.renderDescription(photo)}
+                    </View>
+                </ScrollView>
+
+                {/* Botón flotante para volver atrás */}
+                <TouchableOpacity
+                    onPress={() => this.props.navigation.goBack()}
+                    style={styles.backButton}
+                >
+                    <Ionicon name="arrow-back" size={24} color="#000" />
+                </TouchableOpacity>
+            </SafeAreaView>
+        );
     }
 }
 
+
+// --- NUEVOS ESTILOS ---
 const styles = StyleSheet.create({
-    container: {
-        paddingBottom: 20,
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#fff',
     },
     loader: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: '#fff',
+    },
+    container: {
+        paddingBottom: 40,
     },
     image: {
         width: '100%',
         backgroundColor: '#e1e4e8',
     },
-    photographerContainer: {
+    backButton: {
+        position: 'absolute',
+        top: 20,
+        left: 20,
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+    },
+    interactionBar: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingVertical: 15,
+    },
+    likesContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 15,
+    },
+    likesText: {
+        marginLeft: 8,
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#333',
+    },
+    saveButton: {
+        backgroundColor: '#007AFF', // Azul primario
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 20,
+    },
+    saveButtonSaved: {
+        backgroundColor: '#797979ff', // Verde para "guardado"
+    },
+    saveButtonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+    userInfoContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingBottom: 15,
     },
     photographerImage: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        borderWidth: 1,
+        borderColor: '#ddd',
     },
-    photographerText: {
-        marginLeft: 10,
+    photographerTextContainer: {
+        marginLeft: 12,
     },
     photographerName: {
-        fontWeight: 'bold',
         fontSize: 16,
+        fontWeight: 'bold',
+        color: '#000',
     },
     photographerUsername: {
+        fontSize: 14,
         color: 'gray',
     },
-    description: {
-        paddingHorizontal: 15,
+    descriptionContainer: {
+        paddingHorizontal: 20,
+    },
+    descriptionText: {
         fontSize: 15,
         lineHeight: 22,
+        color: '#333',
     },
-    statsContainer: {
-        paddingHorizontal: 15,
-        marginTop: 10
+    divider: {
+        height: 1,
+        backgroundColor: '#e0e0e0',
+        marginTop: 20,
     },
-    statsText: {
-        fontWeight: 'bold',
-        color: '#333'
-    }
 });

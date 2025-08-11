@@ -1,46 +1,70 @@
-// src/screens/SearchPhotosList.tsx
-
 import React from 'react';
 import { TextInput, StyleSheet, View } from 'react-native';
 import PhotoList, { PhotoListState } from './PhotoList';
 import { Photo } from '../api/UnsplashApiClient';
-// --- CAMBIO 1: Importamos el tipo de props específico para esta pantalla ---
 import { SearchScreenProps } from '../navigation/types';
 
 interface SearchablePhotoListState extends PhotoListState {
     query: string;
 }
 
-// --- CAMBIO 2: Le decimos a la clase que usará SearchScreenProps ---
 export default class SearchPhotosList extends PhotoList<SearchScreenProps, SearchablePhotoListState> {
     public state: SearchablePhotoListState = {
         photos: [],
         query: '',
     };
 
-    // --- CAMBIO 3: El constructor ahora espera recibir SearchScreenProps ---
+    // Propiedad para guardar el temporizador del debounce
+    private debounceTimer: NodeJS.Timeout | null = null;
+
     public constructor(props: SearchScreenProps) {
         super(props);
-        // Ya no es necesario setOptions aquí si lo pones en App.tsx, pero lo dejamos por si acaso.
         props.navigation.setOptions({
             title: 'Buscar',
         });
     }
 
-    protected loadPage(page: number): Promise<{ photos: ReadonlyArray<Photo>; totalPages: number }> {
-        return this.apiClient.searchPhotos(this.state.query, page);
+    /**
+     * Al destruir el componente, limpiamos cualquier temporizador que haya quedado pendiente
+     * para evitar memory leaks.
+     */
+    public componentWillUnmount() {
+        if (this.debounceTimer) {
+            clearTimeout(this.debounceTimer);
+        }
     }
 
+    protected loadPage(page: number): Promise<{ photos: ReadonlyArray<Photo>; totalPages: number }> {
+        // Si el query está vacío, buscamos "popular" por defecto.
+        const queryToSearch = this.state.query.trim() === '' ? 'popular' : this.state.query;
+        return this.apiClient.searchPhotos(queryToSearch, page);
+    }
+
+    /**
+     * Este método se llama en cada cambio del TextInput.
+     * Implementa la lógica de "debounce".
+     */
+    private onQueryChanged = (text: string) => {
+        if (this.debounceTimer) {
+            clearTimeout(this.debounceTimer);
+        }
+
+        this.setState({ query: text });
+
+        this.debounceTimer = setTimeout(() => {
+            this.handleSearch();
+        }, 500); // Espera 500ms antes de buscar
+    };
+
+    /**
+     * Inicia una nueva búsqueda, reseteando la paginación y la lista de fotos.
+     */
     private handleSearch = () => {
         this.nextPage = 1;
         this.totalPages = 1;
-        // --- CAMBIO 4: Usamos la forma funcional y segura de setState, eliminando 'as any' ---
-        this.setState(
-            prevState => ({ ...prevState, photos: [] }), // Solo limpiamos las fotos, mantenemos la query actual
-            () => {
-                this.loadNextPage();
-            }
-        );
+        this.setState({ photos: [] }, () => {
+            this.loadNextPage();
+        });
     };
 
     protected renderHeader(): React.ReactNode {
@@ -50,7 +74,7 @@ export default class SearchPhotosList extends PhotoList<SearchScreenProps, Searc
                     style={styles.searchInput}
                     placeholder="Busca fotos..."
                     value={this.state.query}
-                    onChangeText={text => this.setState({ query: text })}
+                    onChangeText={this.onQueryChanged}
                     onSubmitEditing={this.handleSearch}
                     returnKeyType="search"
                 />
@@ -62,14 +86,14 @@ export default class SearchPhotosList extends PhotoList<SearchScreenProps, Searc
 const styles = StyleSheet.create({
     searchContainer: {
         padding: 10,
-        backgroundColor: '#f0f0f0'
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
     },
     searchInput: {
         height: 40,
-        backgroundColor: 'white',
+        backgroundColor: '#f0f0f0',
         borderRadius: 8,
         paddingHorizontal: 15,
-        borderWidth: 1,
-        borderColor: '#ddd'
-    }
+    },
 });

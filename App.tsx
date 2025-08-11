@@ -25,14 +25,14 @@ const Tab = createBottomTabNavigator();
 const HomeStack = () => (
   <MainStack.Navigator>
     <MainStack.Screen name="home" component={HomeScreen} options={{ title: 'Pixora' }} />
-    <MainStack.Screen name="photoDetails" component={PhotoDetails} />
+    <MainStack.Screen name="photoDetails" component={PhotoDetails} options={{ headerShown: false }} />
   </MainStack.Navigator>
 );
 
 const SearchStack = () => (
   <MainStack.Navigator>
     <MainStack.Screen name="searchList" component={SearchPhotosList} options={{ title: 'Buscar' }} />
-    <MainStack.Screen name="photoDetails" component={PhotoDetails} />
+    <MainStack.Screen name="photoDetails" component={PhotoDetails} options={{ headerShown: false }} />
   </MainStack.Navigator>
 );
 
