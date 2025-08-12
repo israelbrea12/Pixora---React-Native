@@ -4,8 +4,11 @@ import { FlashList } from "@shopify/flash-list";
 import UnsplashApiClient, { Photo } from '../api/UnsplashApiClient';
 import PhotoGridItem from '../components/PhotoGridItem';
 import { HomeScreenProps, SearchScreenProps } from '../navigation/types';
+import { LayoutContext } from '../context/LayoutContext'; // Importamos el contexto
+import MasonryList from '../components/MasonryList'; // Importamos las nuevas listas
+import LinearList from '../components/LinearList';
 
-type PhotoEntry = {
+export type PhotoEntry = {
     key: string;
     photo: Photo;
 };
@@ -20,6 +23,8 @@ export default abstract class PhotoList<
     P extends PhotoListNavProps = PhotoListNavProps,
     S extends PhotoListState = PhotoListState
 > extends Component<P, S> {
+    //declare context: React.ContextType<typeof LayoutContext>;
+    //static contextType = LayoutContext;
     protected apiClient: UnsplashApiClient = new UnsplashApiClient();
     protected nextPage: number = 1;
     protected loading: boolean = false;
@@ -36,15 +41,13 @@ export default abstract class PhotoList<
         }
     }
 
-    public loadNextPage() {
-        if (this.nextPage > this.totalPages) {
-            return;
-        }
-        if (this.loading) {
+    public loadNextPage = () => {
+        if (this.nextPage > this.totalPages || this.loading) {
             return;
         }
 
         this.loading = true;
+        this.forceUpdate();
 
         this.loadPage(this.nextPage)
             .then(({ photos, totalPages }) => {
@@ -64,6 +67,7 @@ export default abstract class PhotoList<
             })
             .finally(() => {
                 this.loading = false;
+                this.forceUpdate();
             });
     }
 
@@ -71,18 +75,28 @@ export default abstract class PhotoList<
 
     public render() {
         return (
-            <View style={styles.container}>
-                {this.renderHeader()}
-                <FlashList
-                    data={this.state.photos}
-                    masonry
-                    renderItem={this.renderGridItem.bind(this)}
-                    keyExtractor={item => item.key}
-                    numColumns={2}
-                    onEndReached={() => this.loadNextPage()}
-                    onEndReachedThreshold={0.5}
-                />
-            </View>
+            <LayoutContext.Consumer>
+                {({ layoutMode }) => (
+                    <View style={styles.container}>
+                        {this.renderHeader()}
+                        {layoutMode === 'masonry' ? (
+                            <MasonryList
+                                photos={this.state.photos}
+                                onEndReached={this.loadNextPage}
+                                onPhotoPress={this.onPhotoPressed}
+                                isLoading={this.loading}
+                            />
+                        ) : (
+                            <LinearList
+                                photos={this.state.photos}
+                                onEndReached={this.loadNextPage}
+                                onPhotoPress={this.onPhotoPressed}
+                                isLoading={this.loading}
+                            />
+                        )}
+                    </View>
+                )}
+            </LayoutContext.Consumer>
         );
     }
 
@@ -90,20 +104,7 @@ export default abstract class PhotoList<
         return null;
     }
 
-    private renderGridItem(rowInfo: { item: PhotoEntry }) {
-        const { photo } = rowInfo.item;
-
-        return (
-            <PhotoGridItem
-                imageURI={photo.urls.small}
-                imageWidth={photo.width}
-                imageHeight={photo.height}
-                onPress={() => this.onPhotoPressed(photo)}
-            />
-        );
-    }
-
-    private onPhotoPressed(photo: Photo) {
+    private onPhotoPressed = (photo: Photo) => {
         this.props.navigation.navigate('photoDetails', { photo: photo });
     }
 }
