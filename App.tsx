@@ -9,13 +9,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 
 // --- CAMBIO: Importamos los tipos de ParamList ---
-import { MainStackParamList, PlaceholderStackParamList } from './navigation/types';
+import { MainStackParamList, PlaceholderStackParamList } from './src/navigation/types';
 
-import HomeScreen from './screens/HomeScreen';
-import SearchPhotosList from './screens/SearchPhotosList';
-import PhotoDetails from './screens/PhotoDetails';
-import PlaceholderScreen from './screens/PlaceholderScreen';
-import ProfileScreen from './screens/ProfileScreen';
+import HomeScreen from './src/screens/HomeScreen';
+import SearchPhotosList from './src/screens/SearchPhotosList';
+import PhotoDetails from './src/screens/PhotoDetails';
+import PlaceholderScreen from './src/screens/PlaceholderScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
 
 // --- CAMBIO: Aplicamos los tipos a los navegadores ---
 const MainStack = createNativeStackNavigator<MainStackParamList>();
