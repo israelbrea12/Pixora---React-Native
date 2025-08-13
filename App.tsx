@@ -39,6 +39,13 @@ const SearchStack = () => (
   </MainStack.Navigator>
 );
 
+// El stack de ajustes ahora solo contiene el perfil.
+const SettingsStack = () => (
+  <MainStack.Navigator>
+    <MainStack.Screen name="profile" component={ProfileScreen} options={{ headerShown: false }} />
+  </MainStack.Navigator>
+);
+
 const AddStack = () => (
   <PlaceholderStack.Navigator>
     <PlaceholderStack.Screen name="add" component={PlaceholderScreen} initialParams={{ title: 'Añadir' }} options={{ title: 'Añadir' }} />
@@ -51,12 +58,7 @@ const ActivityStack = () => (
   </PlaceholderStack.Navigator>
 );
 
-// El stack de ajustes ahora solo contiene el perfil.
-const SettingsStack = () => (
-  <MainStack.Navigator>
-    <MainStack.Screen name="profile" component={ProfileScreen} options={{ headerShown: false }} />
-  </MainStack.Navigator>
-);
+
 
 // --- CAMBIO 4: Creamos un componente para el TabNavigator ---
 const MainTabNavigator = () => {

@@ -4,15 +4,18 @@ import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react
 import { SaveToListScreenProps } from '../navigation/types';
 import { PhotoListInfo, getPhotoLists, createPhotoList, addPhotoToList } from '../services/DatabaseManager';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import PromptModal from '../components/PromptModal';
 
 interface State {
     lists: PhotoListInfo[];
+    isPromptVisible: boolean; // Estado para controlar nuestro modal
 }
 
 export default class SaveToListScreen extends Component<SaveToListScreenProps, State> {
 
     state: State = {
         lists: [],
+        isPromptVisible: false, // Inicialmente oculto
     };
 
     componentDidMount() {
@@ -27,27 +30,19 @@ export default class SaveToListScreen extends Component<SaveToListScreenProps, S
     };
 
     handleCreateList = () => {
-        Alert.prompt(
-            "Nueva Lista",
-            "Introduce el nombre para tu nueva lista.",
-            [
-                { text: "Cancelar", style: "cancel" },
-                {
-                    text: "Crear",
-                    onPress: async (name) => {
-                        if (name && name.trim().length > 0) {
-                            try {
-                                await createPhotoList(name.trim());
-                                this.fetchLists(); // Refrescamos
-                            } catch (e) {
-                                Alert.alert("Error", "Ya existe una lista con ese nombre.");
-                            }
-                        }
-                    },
-                },
-            ],
-            "plain-text"
-        );
+        this.setState({ isPromptVisible: true });
+    };
+
+    submitNewList = async (name: string) => {
+        this.setState({ isPromptVisible: false }); // Cerramos el modal
+        if (name && name.trim().length > 0) {
+            try {
+                await createPhotoList(name.trim());
+                this.fetchLists(); // Refrescamos la lista
+            } catch (e) {
+                Alert.alert("Error", "Ya existe una lista con ese nombre.");
+            }
+        }
     };
 
     handleSelectList = async (list: PhotoListInfo) => {
@@ -63,21 +58,30 @@ export default class SaveToListScreen extends Component<SaveToListScreenProps, S
 
     render() {
         return (
-            <FlatList
-                data={this.state.lists}
-                keyExtractor={item => item.id.toString()}
-                renderItem={({ item }) => (
-                    <TouchableOpacity style={styles.itemContainer} onPress={() => this.handleSelectList(item)}>
-                        <Text style={styles.itemTitle}>{item.name}</Text>
-                    </TouchableOpacity>
-                )}
-                ListHeaderComponent={
-                    <TouchableOpacity style={styles.itemContainer} onPress={this.handleCreateList}>
-                        <Ionicon name="add" size={24} color="#007AFF" />
-                        <Text style={[styles.itemTitle, { color: '#007AFF', fontWeight: 'bold' }]}>Crear nueva lista</Text>
-                    </TouchableOpacity>
-                }
-            />
+            <View style={{ flex: 1 }}>
+                <FlatList
+                    data={this.state.lists}
+                    keyExtractor={item => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity style={styles.itemContainer} onPress={() => this.handleSelectList(item)}>
+                            <Text style={styles.itemTitle}>{item.name}</Text>
+                        </TouchableOpacity>
+                    )}
+                    ListHeaderComponent={
+                        <TouchableOpacity style={styles.itemContainer} onPress={this.handleCreateList}>
+                            <Ionicon name="add" size={24} color="#007AFF" />
+                            <Text style={[styles.itemTitle, { color: '#007AFF', fontWeight: 'bold' }]}>Crear nueva lista</Text>
+                        </TouchableOpacity>
+                    }
+                />
+                <PromptModal
+                    visible={this.state.isPromptVisible}
+                    title="Nueva Lista"
+                    message="Introduce el nombre para tu nueva lista."
+                    onCancel={() => this.setState({ isPromptVisible: false })}
+                    onSubmit={this.submitNewList}
+                />
+            </View>
         );
     }
 }
