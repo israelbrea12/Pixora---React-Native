@@ -1,11 +1,12 @@
+// src/screens/PhotoList.tsx
+
 import React, { Component } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { FlashList } from "@shopify/flash-list";
 import UnsplashApiClient, { Photo } from '../api/UnsplashApiClient';
-import PhotoGridItem from '../components/PhotoGridItem';
-import { HomeScreenProps, SearchScreenProps } from '../navigation/types';
-import { LayoutContext } from '../context/LayoutContext'; // Importamos el contexto
-import MasonryList from '../components/MasonryList'; // Importamos las nuevas listas
+// --- CAMBIO 1: Importamos los tipos que necesitamos para definir la navegación ---
+import { MainStackParamList } from '../navigation/types';
+import { LayoutContext } from '../context/LayoutContext';
+import MasonryList from '../components/MasonryList';
 import LinearList from '../components/LinearList';
 
 export type PhotoEntry = {
@@ -13,7 +14,21 @@ export type PhotoEntry = {
     photo: Photo;
 };
 
-type PhotoListNavProps = HomeScreenProps | SearchScreenProps;
+// --- CAMBIO 2: Reemplazamos la unión de tipos por una interfaz más flexible ---
+// Esto define las capacidades mínimas que necesita la prop 'navigation'.
+// Todos los tipos de props de pantalla (HomeScreenProps, FavoritesScreenProps, etc.) cumplen este contrato.
+type PhotoListNavProps = {
+    navigation: {
+        navigate<RouteName extends keyof MainStackParamList>(
+            ...args: undefined extends MainStackParamList[RouteName]
+                ? [RouteName] | [RouteName, MainStackParamList[RouteName]]
+                : [RouteName, MainStackParamList[RouteName]]
+        ): void;
+        addListener: (type: 'focus', callback: () => void) => () => void;
+        removeListener: (type: 'focus', callback: () => void) => void;
+    };
+    route: any;
+};
 
 export interface PhotoListState {
     photos: ReadonlyArray<PhotoEntry>;
@@ -23,17 +38,13 @@ export default abstract class PhotoList<
     P extends PhotoListNavProps = PhotoListNavProps,
     S extends PhotoListState = PhotoListState
 > extends Component<P, S> {
-    //declare context: React.ContextType<typeof LayoutContext>;
-    //static contextType = LayoutContext;
+
+    // El resto del fichero no cambia en absoluto.
+
     protected apiClient: UnsplashApiClient = new UnsplashApiClient();
     protected nextPage: number = 1;
     protected loading: boolean = false;
     protected totalPages: number = 1;
-
-    public constructor(props: P) {
-        super(props);
-        this.state = { photos: [] } as unknown as S;
-    }
 
     public componentDidMount() {
         if (this.state.photos.length === 0) {
@@ -105,6 +116,7 @@ export default abstract class PhotoList<
     }
 
     private onPhotoPressed = (photo: Photo) => {
+        // Ahora la llamada a .navigate() es válida porque nuestro tipo flexible lo permite.
         this.props.navigation.navigate('photoDetails', { photo: photo });
     }
 }

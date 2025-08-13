@@ -13,6 +13,7 @@ import {
 import UnsplashApiClient, { Photo } from '../api/UnsplashApiClient';
 import { PhotoDetailsScreenProps } from '../navigation/types';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import { addFavorite, removeFavorite, isFavorite } from '../services/DatabaseManager';
 
 // Estado local para la vista, incluyendo el estado de la UI
 interface PhotoDetailsState {
@@ -51,11 +52,29 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
                 console.error(error);
                 this.setState({ isLoading: false });
             });
+        isFavorite(this.photoID).then(isFav => {
+            this.setState({ isFavorite: isFav });
+        });
     }
 
     // --- Funciones para simular interacciones ---
-    private toggleFavorite = () => {
-        this.setState(prevState => ({ isFavorite: !prevState.isFavorite }));
+    private toggleFavorite = async () => {
+        const { isFavorite, photo } = this.state;
+        const newIsFavorite = !isFavorite;
+
+        try {
+            if (newIsFavorite) {
+                // Si no era favorita, la añadimos
+                await addFavorite(photo);
+            } else {
+                // Si ya era favorita, la eliminamos
+                await removeFavorite(photo.id);
+            }
+            // Actualizamos el estado de la UI solo si la operación en la BD fue exitosa
+            this.setState({ isFavorite: newIsFavorite });
+        } catch (error) {
+            console.error("Failed to toggle favorite status:", error);
+        }
     };
 
     private toggleSaved = () => {

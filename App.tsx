@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { LayoutProvider } from './src/context/LayoutContext';
 import { MenuProvider } from 'react-native-popup-menu';
+import { initDB } from './src/services/DatabaseManager';
 
 // --- CAMBIO: Importamos los tipos de ParamList ---
 import { MainStackParamList, PlaceholderStackParamList } from './src/navigation/types';
@@ -80,6 +81,7 @@ export default class App extends Component<{}, AppState> {
     this.state = {
       initialRouteName: null,
     };
+    initDB();
   }
 
   public componentDidMount() {

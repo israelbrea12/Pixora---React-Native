@@ -6,6 +6,7 @@ import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert } from 'r
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import PlaceholderScreen from './PlaceholderScreen';
+import FavoritesScreen from './FavoritesScreen';
 import { LayoutContext } from '../context/LayoutContext';
 import { LayoutMode } from '../services/PreferencesManager';
 import {
@@ -14,8 +15,9 @@ import {
     MenuOption,
     MenuTrigger,
 } from 'react-native-popup-menu';
+import { ProfileTabParamList } from '../navigation/types';
 
-const TopTab = createMaterialTopTabNavigator();
+const TopTab = createMaterialTopTabNavigator<ProfileTabParamList>();
 
 // --- Definimos los estados posibles del menú ---
 type MenuState = 'hidden' | 'main' | 'layout';
@@ -35,7 +37,11 @@ const ProfileTabNavigator = () => (
     >
         <TopTab.Screen name="MyPhotos" component={PlaceholderScreen} options={{ title: 'Mis Fotos' }} initialParams={{ title: 'Mis Fotos' }} />
         <TopTab.Screen name="Lists" component={PlaceholderScreen} options={{ title: 'Listas' }} initialParams={{ title: 'Listas' }} />
-        <TopTab.Screen name="Favorites" component={PlaceholderScreen} options={{ title: 'Favoritos' }} initialParams={{ title: 'Favoritos' }} />
+        <TopTab.Screen
+            name="Favorites"
+            component={FavoritesScreen}
+            options={{ title: 'Favoritos' }}
+        />
     </TopTab.Navigator>
 );
 
