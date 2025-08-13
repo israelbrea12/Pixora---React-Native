@@ -2,99 +2,125 @@
 import SQLite from 'react-native-sqlite-2';
 import { Photo } from '../api/UnsplashApiClient';
 
-// Abrimos la base de datos. [cite_start]Se creará si no existe. [cite: 37, 44]
-const db = SQLite.openDatabase('pixora_favorites.db', '1.0', '', 1);
+const db = SQLite.openDatabase('pixora.db', '1.0', '', 1);
 
-/**
- * Prepara la base de datos, creando la tabla de favoritos si no existe.
- * Esta función debe llamarse una vez al iniciar la app.
- */
+// --- NUEVO TIPO: Para la información de una lista de fotos ---
+export type PhotoListInfo = {
+    id: number;
+    name: string;
+}
+
 export const initDB = (): void => {
-    db.transaction(txn => { // [cite: 38]
-        txn.executeSql( // [cite: 40, 46]
-            `CREATE TABLE IF NOT EXISTS Favorites (
-                id TEXT PRIMARY KEY NOT NULL,
-                photoData TEXT NOT NULL
+    db.transaction(txn => {
+        txn.executeSql(
+            `CREATE TABLE IF NOT EXISTS Favorites (id TEXT PRIMARY KEY NOT NULL, photoData TEXT NOT NULL)`,
+            []
+        );
+        // --- NUEVA TABLA: Para guardar los nombres de las listas ---
+        txn.executeSql(
+            `CREATE TABLE IF NOT EXISTS PhotoLists (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE)`,
+            []
+        );
+        // --- NUEVA TABLA: Para relacionar fotos y listas (relación muchos a muchos) ---
+        txn.executeSql(
+            `CREATE TABLE IF NOT EXISTS ListEntries (
+                listId INTEGER NOT NULL,
+                photoId TEXT NOT NULL,
+                photoData TEXT NOT NULL,
+                PRIMARY KEY (listId, photoId),
+                FOREIGN KEY (listId) REFERENCES PhotoLists(id) ON DELETE CASCADE
             )`,
             []
         );
     });
 };
 
-/**
- * Añade una foto a la tabla de favoritos.
- * @param photo El objeto de la foto a guardar.
- */
+// --- Funciones para Listas (NUEVAS) ---
+
+export const createPhotoList = (name: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        db.transaction(txn => {
+            txn.executeSql('INSERT INTO PhotoLists (name) VALUES (?)', [name], () => resolve(), (_, err) => { reject(err); return false; });
+        });
+    });
+};
+
+export const getPhotoLists = (): Promise<PhotoListInfo[]> => {
+    return new Promise((resolve, reject) => {
+        db.transaction(txn => {
+            txn.executeSql('SELECT id, name FROM PhotoLists', [], (_, { rows }) => {
+                const lists: PhotoListInfo[] = [];
+                for (let i = 0; i < rows.length; i++) {
+                    lists.push(rows.item(i));
+                }
+                resolve(lists);
+            }, (_, err) => { reject(err); return false; });
+        });
+    });
+};
+
+export const addPhotoToList = (listId: number, photo: Photo): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        db.transaction(txn => {
+            txn.executeSql(
+                'INSERT OR IGNORE INTO ListEntries (listId, photoId, photoData) VALUES (?, ?, ?)',
+                [listId, photo.id, JSON.stringify(photo)],
+                () => resolve(),
+                (_, err) => { reject(err); return false; }
+            );
+        });
+    });
+};
+
+export const isPhotoSaved = (photoId: string): Promise<boolean> => {
+    return new Promise((resolve, reject) => {
+        db.transaction(txn => {
+            txn.executeSql('SELECT listId FROM ListEntries WHERE photoId = ? LIMIT 1', [photoId], (_, { rows }) => {
+                resolve(rows.length > 0);
+            }, (_, err) => { reject(err); return false; });
+        });
+    });
+};
+
+
+// --- Funciones de Favoritos (sin cambios) ---
+
 export const addFavorite = (photo: Photo): Promise<void> => {
     return new Promise((resolve, reject) => {
         db.transaction(txn => {
-            txn.executeSql(
-                'INSERT OR REPLACE INTO Favorites (id, photoData) VALUES (?, ?)',
-                [photo.id, JSON.stringify(photo)], // Guardamos el objeto foto como un string JSON
-                () => resolve(),
-                (_, error) => { reject(error); return false; }
-            );
+            txn.executeSql('INSERT OR REPLACE INTO Favorites (id, photoData) VALUES (?, ?)', [photo.id, JSON.stringify(photo)], () => resolve(), (_, error) => { reject(error); return false; });
         });
     });
 };
 
-/**
- * Elimina una foto de la tabla de favoritos.
- * @param photoId El ID de la foto a eliminar.
- */
 export const removeFavorite = (photoId: string): Promise<void> => {
     return new Promise((resolve, reject) => {
         db.transaction(txn => {
-            txn.executeSql(
-                'DELETE FROM Favorites WHERE id = ?',
-                [photoId],
-                () => resolve(),
-                (_, error) => { reject(error); return false; }
-            );
+            txn.executeSql('DELETE FROM Favorites WHERE id = ?', [photoId], () => resolve(), (_, error) => { reject(error); return false; });
         });
     });
 };
 
-/**
- * Obtiene todas las fotos guardadas como favoritas.
- * @returns Una promesa que resuelve a un array de objetos Photo.
- */
 export const getFavorites = (): Promise<Photo[]> => {
     return new Promise((resolve, reject) => {
         db.transaction(txn => {
-            txn.executeSql(
-                'SELECT photoData FROM Favorites',
-                [],
-                (_, { rows }) => {
-                    const favorites: Photo[] = [];
-                    for (let i = 0; i < rows.length; i++) {
-                        // Parseamos el string JSON de vuelta a un objeto Photo
-                        favorites.push(JSON.parse(rows.item(i).photoData));
-                    }
-                    resolve(favorites);
-                },
-                (_, error) => { reject(error); return false; }
-            );
+            txn.executeSql('SELECT photoData FROM Favorites', [], (_, { rows }) => {
+                const favorites: Photo[] = [];
+                for (let i = 0; i < rows.length; i++) {
+                    favorites.push(JSON.parse(rows.item(i).photoData));
+                }
+                resolve(favorites);
+            }, (_, error) => { reject(error); return false; });
         });
     });
 };
 
-/**
- * Comprueba si una foto ya está en favoritos.
- * @param photoId El ID de la foto a comprobar.
- * @returns Una promesa que resuelve a `true` si es favorita, o `false` si no.
- */
 export const isFavorite = (photoId: string): Promise<boolean> => {
     return new Promise((resolve) => {
         db.transaction(txn => {
-            txn.executeSql(
-                'SELECT id FROM Favorites WHERE id = ?',
-                [photoId],
-                (_, { rows }) => {
-                    resolve(rows.length > 0);
-                },
-                () => { resolve(false); return false; }
-            );
+            txn.executeSql('SELECT id FROM Favorites WHERE id = ?', [photoId], (_, { rows }) => {
+                resolve(rows.length > 0);
+            }, () => { resolve(false); return false; });
         });
     });
 };

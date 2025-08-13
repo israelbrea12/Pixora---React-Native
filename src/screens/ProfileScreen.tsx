@@ -7,6 +7,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import PlaceholderScreen from './PlaceholderScreen';
 import FavoritesScreen from './FavoritesScreen';
+import ListsScreen from './ListsScreen';
 import { LayoutContext } from '../context/LayoutContext';
 import { LayoutMode } from '../services/PreferencesManager';
 import {
@@ -36,7 +37,11 @@ const ProfileTabNavigator = () => (
         }}
     >
         <TopTab.Screen name="MyPhotos" component={PlaceholderScreen} options={{ title: 'Mis Fotos' }} initialParams={{ title: 'Mis Fotos' }} />
-        <TopTab.Screen name="Lists" component={PlaceholderScreen} options={{ title: 'Listas' }} initialParams={{ title: 'Listas' }} />
+        <TopTab.Screen
+            name="Lists"
+            component={ListsScreen}
+            options={{ title: 'Listas' }}
+        />
         <TopTab.Screen
             name="Favorites"
             component={FavoritesScreen}

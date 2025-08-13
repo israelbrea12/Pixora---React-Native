@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { StyleSheet, View } from 'react-native';
 import UnsplashApiClient, { Photo } from '../api/UnsplashApiClient';
 // --- CAMBIO 1: Importamos los tipos que necesitamos para definir la navegación ---
-import { MainStackParamList } from '../navigation/types';
+import { RootStackParamList } from '../navigation/types';
 import { LayoutContext } from '../context/LayoutContext';
 import MasonryList from '../components/MasonryList';
 import LinearList from '../components/LinearList';
@@ -19,10 +19,10 @@ export type PhotoEntry = {
 // Todos los tipos de props de pantalla (HomeScreenProps, FavoritesScreenProps, etc.) cumplen este contrato.
 type PhotoListNavProps = {
     navigation: {
-        navigate<RouteName extends keyof MainStackParamList>(
-            ...args: undefined extends MainStackParamList[RouteName]
-                ? [RouteName] | [RouteName, MainStackParamList[RouteName]]
-                : [RouteName, MainStackParamList[RouteName]]
+        navigate<RouteName extends keyof RootStackParamList>(
+            ...args: undefined extends RootStackParamList[RouteName]
+                ? [RouteName] | [RouteName, RootStackParamList[RouteName]]
+                : [RouteName, RootStackParamList[RouteName]]
         ): void;
         addListener: (type: 'focus', callback: () => void) => () => void;
         removeListener: (type: 'focus', callback: () => void) => void;

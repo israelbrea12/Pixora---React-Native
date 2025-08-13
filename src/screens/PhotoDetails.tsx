@@ -13,6 +13,7 @@ import {
 import UnsplashApiClient, { Photo } from '../api/UnsplashApiClient';
 import { PhotoDetailsScreenProps } from '../navigation/types';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import { isPhotoSaved } from '../services/DatabaseManager';
 import { addFavorite, removeFavorite, isFavorite } from '../services/DatabaseManager';
 
 // Estado local para la vista, incluyendo el estado de la UI
@@ -55,6 +56,9 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
         isFavorite(this.photoID).then(isFav => {
             this.setState({ isFavorite: isFav });
         });
+        isPhotoSaved(this.photoID).then(isSaved => {
+            this.setState({ isSaved: isSaved });
+        });
     }
 
     // --- Funciones para simular interacciones ---
@@ -81,6 +85,11 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
         this.setState(prevState => ({ isSaved: !prevState.isSaved }));
     };
 
+    private openSaveToListScreen = () => {
+        const { photo } = this.state;
+        this.props.navigation.navigate('SaveToList', { photo });
+    };
+
     // --- Sub-componentes de renderizado ---
 
     private renderInteractionBar(photo: Photo) {
@@ -101,7 +110,7 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
 
                 {/* Botón de Guardar */}
                 <TouchableOpacity
-                    onPress={this.toggleSaved}
+                    onPress={this.openSaveToListScreen}
                     style={[styles.saveButton, isSaved && styles.saveButtonSaved]}
                 >
                     <Text style={styles.saveButtonText}>{isSaved ? 'Guardado' : 'Guardar'}</Text>

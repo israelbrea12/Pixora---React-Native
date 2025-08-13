@@ -3,6 +3,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
+
 // 1. Hacemos que las props sean opcionales usando el signo '?'
 interface PlaceholderProps {
     route?: {
