@@ -1325,6 +1325,8 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-sqlite-2 (3.6.2):
+    - React-Core
   - React-NativeModulesApple (0.78.3):
     - glog
     - hermes-engine
@@ -1744,6 +1746,7 @@ DEPENDENCIES:
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
+  - react-native-sqlite-2 (from `../node_modules/react-native-sqlite-2`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-performancetimeline (from `../node_modules/react-native/ReactCommon/react/performance/timeline`)
@@ -1861,6 +1864,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-pager-view"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
+  react-native-sqlite-2:
+    :path: "../node_modules/react-native-sqlite-2"
   React-NativeModulesApple:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios"
   React-perflogger:
@@ -1966,6 +1971,7 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: 9f9819152d22361967a6dfaaca7828af37b0ae70
   react-native-pager-view: 5bab97f356bdaba4ed3b08cf3fa6e927c0746b2b
   react-native-safe-area-context: 63e27bb3aeb2c0ef652f8913d731573932080ff9
+  react-native-sqlite-2: 21c4a9d439e92193a8712c68492731c014671b53
   React-NativeModulesApple: 7c9c0c4e76731529b2e15f5d5edb266b980556ea
   React-perflogger: 069d41f741187be92ed46c6ac67add03b99f3166
   React-performancetimeline: 6deb6607876acc3d5647bd994e139639702fb28e

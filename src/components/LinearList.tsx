@@ -1,7 +1,7 @@
 // src/components/LinearList.tsx
 import React from 'react';
 import { FlashList } from '@shopify/flash-list';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
 import PhotoCard from './PhotoCard';
 import { PhotoEntry } from '../screens/PhotoList';
 
@@ -14,7 +14,7 @@ interface LinearListProps {
 }
 
 const LinearList = ({ photos, onEndReached, onPhotoPress, isLoading }: LinearListProps) => (
-    <FlashList
+    <FlatList
         data={photos}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (

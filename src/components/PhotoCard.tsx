@@ -28,6 +28,8 @@ const PhotoCard = ({ photo, onPress }: PhotoCardProps) => (
 
 const styles = StyleSheet.create({
     card: {
+        marginBottom: 10,
+        marginTop: 10,
         backgroundColor: '#fff',
         borderRadius: 12,
         overflow: 'hidden',

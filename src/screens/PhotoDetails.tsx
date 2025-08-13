@@ -119,45 +119,40 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
     }
 
     public render() {
-        // Muestra un loader mientras se obtienen todos los detalles
         if (this.state.isLoading && !this.state.photo.urls.regular) {
             return <ActivityIndicator size="large" style={styles.loader} />;
         }
 
         const { photo } = this.state;
-
-        // Calculamos la altura de la imagen para que se ajuste al ancho de la pantalla
         const imageWidth = Dimensions.get('window').width;
         const imageHeight = (imageWidth * photo.height) / photo.width;
 
         return (
+            // El SafeAreaView sigue siendo el contenedor principal
             <SafeAreaView style={styles.safeArea}>
-                <ScrollView>
-                    <View style={styles.container}>
-                        {/* Imagen principal */}
-                        <Image
-                            style={[styles.image, { height: imageHeight }]}
-                            source={{ uri: photo.urls.regular }}
-                        />
+                {/* --- CAMBIO: Añadimos un View contenedor --- */}
+                {/* Este View ocupará todo el espacio DENTRO del área segura */}
+                <View style={styles.wrapper}>
+                    <ScrollView>
+                        <View style={styles.container}>
+                            <Image
+                                style={[styles.image, { height: imageHeight }]}
+                                source={{ uri: photo.urls.regular }}
+                            />
+                            {this.renderInteractionBar(photo)}
+                            {this.renderUserInfo(photo)}
+                            {this.renderDescription(photo)}
+                        </View>
+                    </ScrollView>
 
-                        {/* Barra de Interacción */}
-                        {this.renderInteractionBar(photo)}
-
-                        {/* Información del Fotógrafo */}
-                        {this.renderUserInfo(photo)}
-
-                        {/* Descripción */}
-                        {this.renderDescription(photo)}
-                    </View>
-                </ScrollView>
-
-                {/* Botón flotante para volver atrás */}
-                <TouchableOpacity
-                    onPress={() => this.props.navigation.goBack()}
-                    style={styles.backButton}
-                >
-                    <Ionicon name="arrow-back" size={24} color="#000" />
-                </TouchableOpacity>
+                    {/* El botón ahora es hijo del View wrapper, no del SafeAreaView */}
+                    <TouchableOpacity
+                        onPress={() => this.props.navigation.goBack()}
+                        style={styles.backButton}
+                    >
+                        <Ionicon name="arrow-back" size={24} color="#000" />
+                    </TouchableOpacity>
+                </View>
             </SafeAreaView>
         );
     }
@@ -175,6 +170,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#fff',
+    },
+    wrapper: {
+        flex: 1,
+        position: 'relative', // Necesario para que 'absolute' funcione correctamente dentro
     },
     container: {
         paddingBottom: 40,
