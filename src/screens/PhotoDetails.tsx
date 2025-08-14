@@ -6,6 +6,9 @@ import Ionicon from 'react-native-vector-icons/Ionicons';
 import { isPhotoSaved } from '../services/DatabaseManager';
 import { addFavorite, removeFavorite, isFavorite } from '../services/DatabaseManager';
 
+
+const AnimatedIonicon = Animated.createAnimatedComponent(Ionicon);
+
 // Estado local para la vista, incluyendo el estado de la UI
 interface PhotoDetailsState {
     photo: Photo;
@@ -20,6 +23,8 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
     private focusListener: any;
     private imageOpacity = new Animated.Value(0);
     private imageScale = new Animated.Value(0.9);
+    private heartScale = new Animated.Value(1); // Escala para el corazón
+    private saveButtonScale = new Animated.Value(1); // Escala para el botón de guardar
 
     public constructor(props: PhotoDetailsScreenProps) {
         super(props);
@@ -77,24 +82,40 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
         }
     }
 
+    componentDidUpdate(prevProps: PhotoDetailsScreenProps, prevState: PhotoDetailsState) {
+        // Si el estado de 'isSaved' ha cambiado...
+        if (prevState.isSaved !== this.state.isSaved) {
+            this.saveButtonScale.setValue(0.9); // Lo hacemos un poco más pequeño
+            Animated.timing(this.saveButtonScale, { // Usamos timing para un efecto más suave
+                toValue: 1,
+                duration: 300,
+                useNativeDriver: true,
+            }).start();
+        }
+    }
+
     // --- Funciones para simular interacciones ---
-    private toggleFavorite = async () => {
+    private toggleFavorite = () => {
+        // Animación de rebote para el corazón
+        this.heartScale.setValue(0.8); // Lo hacemos un poco más pequeño
+        Animated.spring(this.heartScale, {
+            toValue: 1,
+            friction: 3, // Controla la fuerza del "muelle"
+            useNativeDriver: true,
+        }).start();
+
         const { isFavorite, photo } = this.state;
         const newIsFavorite = !isFavorite;
 
-        try {
-            if (newIsFavorite) {
-                // Si no era favorita, la añadimos
-                await addFavorite(photo);
-            } else {
-                // Si ya era favorita, la eliminamos
-                await removeFavorite(photo.id);
-            }
-            // Actualizamos el estado de la UI solo si la operación en la BD fue exitosa
-            this.setState({ isFavorite: newIsFavorite });
-        } catch (error) {
-            console.error("Failed to toggle favorite status:", error);
-        }
+        // La lógica de la base de datos se ejecuta de forma asíncrona
+        const dbOperation = newIsFavorite ? addFavorite(photo) : removeFavorite(photo.id);
+        dbOperation
+            .then(() => {
+                this.setState({ isFavorite: newIsFavorite });
+            })
+            .catch(error => {
+                console.error("Failed to toggle favorite status:", error);
+            });
     };
 
     private checkStatus = () => {
@@ -106,10 +127,6 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
         });
     }
 
-    private toggleSaved = () => {
-        this.setState(prevState => ({ isSaved: !prevState.isSaved }));
-    };
-
     private openSaveToListScreen = () => {
         const { photo } = this.state;
         this.props.navigation.navigate('SaveToList', { photo });
@@ -119,27 +136,39 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
 
     private renderInteractionBar(photo: Photo) {
         const { isFavorite, isSaved } = this.state;
+
+        // --- CAMBIO 5: Aplicamos los estilos de transformación animados ---
+        const animatedHeartStyle = {
+            transform: [{ scale: this.heartScale }],
+        };
+        const animatedSaveButtonStyle = {
+            transform: [{ scale: this.saveButtonScale }],
+        };
+
         return (
             <View style={styles.interactionBar}>
-                {/* Sección de "Me gusta" */}
                 <View style={styles.likesContainer}>
                     <TouchableOpacity onPress={this.toggleFavorite}>
-                        <Ionicon
+                        {/* Usamos nuestro AnimatedIonicon y le aplicamos el estilo */}
+                        <AnimatedIonicon
                             name={isFavorite ? 'heart' : 'heart-outline'}
                             size={28}
                             color={isFavorite ? '#E91E63' : '#333'}
+                            style={animatedHeartStyle}
                         />
                     </TouchableOpacity>
                     <Text style={styles.likesText}>{photo.likes.toLocaleString()}</Text>
                 </View>
 
-                {/* Botón de Guardar */}
-                <TouchableOpacity
-                    onPress={this.openSaveToListScreen}
-                    style={[styles.saveButton, isSaved && styles.saveButtonSaved]}
-                >
-                    <Text style={styles.saveButtonText}>{isSaved ? 'Guardado' : 'Guardar'}</Text>
-                </TouchableOpacity>
+                {/* Envolvemos el botón en un Animated.View para poder animarlo */}
+                <Animated.View style={animatedSaveButtonStyle}>
+                    <TouchableOpacity
+                        onPress={this.openSaveToListScreen}
+                        style={[styles.saveButton, isSaved && styles.saveButtonSaved]}
+                    >
+                        <Text style={styles.saveButtonText}>{isSaved ? 'Guardado' : 'Guardar'}</Text>
+                    </TouchableOpacity>
+                </Animated.View>
             </View>
         );
     }
