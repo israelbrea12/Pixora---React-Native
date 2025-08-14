@@ -82,6 +82,30 @@ export const isPhotoSaved = (photoId: string): Promise<boolean> => {
     });
 };
 
+/**
+ * Obtiene todas las fotos que pertenecen a una lista específica.
+ * @param listId El ID de la lista.
+ * @returns Una promesa que resuelve a un array de objetos Photo.
+ */
+export const getPhotosInList = (listId: number): Promise<Photo[]> => {
+    return new Promise((resolve, reject) => {
+        db.transaction(txn => {
+            txn.executeSql(
+                'SELECT photoData FROM ListEntries WHERE listId = ?',
+                [listId],
+                (_, { rows }) => {
+                    const photos: Photo[] = [];
+                    for (let i = 0; i < rows.length; i++) {
+                        photos.push(JSON.parse(rows.item(i).photoData));
+                    }
+                    resolve(photos);
+                },
+                (_, err) => { reject(err); return false; }
+            );
+        });
+    });
+};
+
 
 // --- Funciones de Favoritos (sin cambios) ---
 
