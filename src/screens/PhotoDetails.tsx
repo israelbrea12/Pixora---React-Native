@@ -27,6 +27,7 @@ interface PhotoDetailsState {
 export default class PhotoDetails extends Component<PhotoDetailsScreenProps, PhotoDetailsState> {
     private apiClient: UnsplashApiClient = new UnsplashApiClient();
     private photoID: string;
+    private focusListener: any;
 
     public constructor(props: PhotoDetailsScreenProps) {
         super(props);
@@ -59,6 +60,15 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
         isPhotoSaved(this.photoID).then(isSaved => {
             this.setState({ isSaved: isSaved });
         });
+        this.checkStatus();
+        this.focusListener = this.props.navigation.addListener('focus', this.checkStatus);
+    }
+
+    public componentWillUnmount() {
+        // Limpiamos el listener para evitar memory leaks al cerrar la pantalla
+        if (this.focusListener) {
+            this.props.navigation.removeListener('focus', this.checkStatus);
+        }
     }
 
     // --- Funciones para simular interacciones ---
@@ -80,6 +90,15 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
             console.error("Failed to toggle favorite status:", error);
         }
     };
+
+    private checkStatus = () => {
+        isFavorite(this.photoID).then(isFav => {
+            this.setState({ isFavorite: isFav });
+        });
+        isPhotoSaved(this.photoID).then(isSaved => {
+            this.setState({ isSaved: isSaved });
+        });
+    }
 
     private toggleSaved = () => {
         this.setState(prevState => ({ isSaved: !prevState.isSaved }));
