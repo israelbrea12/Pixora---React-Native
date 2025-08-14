@@ -1,15 +1,5 @@
 import React, { Component } from 'react';
-import {
-    StyleSheet,
-    Text,
-    View,
-    ScrollView,
-    Image,
-    ActivityIndicator,
-    TouchableOpacity,
-    SafeAreaView,
-    Dimensions
-} from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Image, ActivityIndicator, TouchableOpacity, SafeAreaView, Dimensions, Animated } from 'react-native';
 import UnsplashApiClient, { Photo } from '../api/UnsplashApiClient';
 import { PhotoDetailsScreenProps } from '../navigation/types';
 import Ionicon from 'react-native-vector-icons/Ionicons';
@@ -28,6 +18,8 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
     private apiClient: UnsplashApiClient = new UnsplashApiClient();
     private photoID: string;
     private focusListener: any;
+    private imageOpacity = new Animated.Value(0);
+    private imageScale = new Animated.Value(0.9);
 
     public constructor(props: PhotoDetailsScreenProps) {
         super(props);
@@ -62,6 +54,20 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
         });
         this.checkStatus();
         this.focusListener = this.props.navigation.addListener('focus', this.checkStatus);
+        Animated.parallel([
+            // Animación de timing para la opacidad (de 0 a 1) [cite: 28, 35]
+            Animated.timing(this.imageOpacity, {
+                toValue: 1,
+                duration: 600, // 600 milisegundos
+                useNativeDriver: true,
+            }),
+            // Animación de spring para la escala (de 0.9 a 1 con rebote) [cite: 43, 52]
+            Animated.spring(this.imageScale, {
+                toValue: 1,
+                friction: 5,
+                useNativeDriver: true,
+            }),
+        ]).start(); // Iniciamos la animación [cite: 70, 71]
     }
 
     public componentWillUnmount() {
@@ -182,8 +188,15 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
                 <View style={styles.wrapper}>
                     <ScrollView>
                         <View style={styles.container}>
-                            <Image
-                                style={[styles.image, { height: imageHeight }]}
+                            <Animated.Image
+                                style={[
+                                    styles.image,
+                                    {
+                                        height: imageHeight,
+                                        opacity: this.imageOpacity, // Aplicamos la opacidad animada [cite: 18]
+                                        transform: [{ scale: this.imageScale }] // Aplicamos la escala animada
+                                    }
+                                ]}
                                 source={{ uri: photo.urls.regular }}
                             />
                             {this.renderInteractionBar(photo)}
