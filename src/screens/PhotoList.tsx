@@ -1,7 +1,7 @@
 // src/screens/PhotoList.tsx
 
 import React, { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, SafeAreaView } from 'react-native';
 import UnsplashApiClient, { Photo } from '../api/UnsplashApiClient';
 // --- CAMBIO 1: Importamos los tipos que necesitamos para definir la navegación ---
 import { RootStackParamList } from '../navigation/types';
@@ -86,28 +86,30 @@ export default abstract class PhotoList<
 
     public render() {
         return (
-            <LayoutContext.Consumer>
-                {({ layoutMode }) => (
-                    <View style={styles.container}>
-                        {this.renderHeader()}
-                        {layoutMode === 'masonry' ? (
-                            <MasonryList
-                                photos={this.state.photos}
-                                onEndReached={this.loadNextPage}
-                                onPhotoPress={this.onPhotoPressed}
-                                isLoading={this.loading}
-                            />
-                        ) : (
-                            <LinearList
-                                photos={this.state.photos}
-                                onEndReached={this.loadNextPage}
-                                onPhotoPress={this.onPhotoPressed}
-                                isLoading={this.loading}
-                            />
-                        )}
-                    </View>
-                )}
-            </LayoutContext.Consumer>
+            <SafeAreaView style={styles.safeArea}>
+                <LayoutContext.Consumer>
+                    {({ layoutMode }) => (
+                        <View style={styles.container}>
+                            {this.renderHeader()}
+                            {layoutMode === 'masonry' ? (
+                                <MasonryList
+                                    photos={this.state.photos}
+                                    onEndReached={this.loadNextPage}
+                                    onPhotoPress={this.onPhotoPressed}
+                                    isLoading={this.loading}
+                                />
+                            ) : (
+                                <LinearList
+                                    photos={this.state.photos}
+                                    onEndReached={this.loadNextPage}
+                                    onPhotoPress={this.onPhotoPressed}
+                                    isLoading={this.loading}
+                                />
+                            )}
+                        </View>
+                    )}
+                </LayoutContext.Consumer>
+            </SafeAreaView>
         );
     }
 
@@ -122,6 +124,10 @@ export default abstract class PhotoList<
 }
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#fff', // Es bueno darle un color de fondo
+    },
     container: {
         flex: 1,
         backgroundColor: '#fff',
