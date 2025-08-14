@@ -139,36 +139,38 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
     };
 
     private handleSavePhoto = async () => {
+        // La lógica de permisos ahora depende de la versión de Android
         if (Platform.OS === 'android') {
             try {
-                const granted = await PermissionsAndroid.request(
-                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                    {
-                        title: "Permiso para guardar fotos",
-                        message: "Esta app necesita acceso a tu almacenamiento para descargar la imagen.",
-                        buttonPositive: "Aceptar",
-                        buttonNegative: "Cancelar"
-                    }
-                );
+                // Comprobamos si la versión de Android es 13 o superior
+                const isAndroid13OrUp = Platform.Version >= 33;
 
-                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-                    // Si el permiso fue otorgado, no hacemos nada aquí y dejamos que el código de abajo se ejecute.
-                    console.log("Permiso de almacenamiento concedido.");
-                } else if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
-                    // El usuario denegó el permiso y marcó "No volver a preguntar".
-                    Alert.alert(
-                        "Permiso denegado permanentemente",
-                        "Has denegado el permiso para guardar fotos. Por favor, ve a los ajustes de la app para habilitarlo.",
-                        [
-                            { text: "Cancelar", style: "cancel" },
-                            { text: "Abrir Ajustes", onPress: () => Linking.openSettings() } // Abre los ajustes de la app
-                        ]
-                    );
-                    return; // Detenemos la ejecución
-                } else {
-                    // El usuario simplemente denegó el permiso esta vez.
+                // Definimos el permiso a solicitar
+                const permission = isAndroid13OrUp
+                    ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
+                    : PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
+
+                const granted = await PermissionsAndroid.request(permission, {
+                    title: "Permiso para guardar fotos",
+                    message: "Esta app necesita acceso a tu galería para descargar la imagen.",
+                    buttonPositive: "Aceptar",
+                    buttonNegative: "Cancelar"
+                });
+
+                if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
                     Alert.alert("Permiso denegado", "No puedes guardar la foto sin aceptar el permiso.");
-                    return; // Detenemos la ejecución
+                    // Comprobamos si el usuario denegó permanentemente el permiso
+                    if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+                        Alert.alert(
+                            "Permiso denegado permanentemente",
+                            "Para guardar fotos, necesitas activar el permiso de almacenamiento desde los ajustes de la app.",
+                            [
+                                { text: "Cancelar", style: "cancel" },
+                                { text: "Abrir Ajustes", onPress: () => Linking.openSettings() }
+                            ]
+                        );
+                    }
+                    return; // Detenemos la ejecución si no hay permiso
                 }
             } catch (err) {
                 console.warn(err);
@@ -176,7 +178,7 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
             }
         }
 
-        // El resto de la lógica (llamar a PhotoSaver.savePhoto) solo se ejecuta si los permisos están OK
+        // Si tenemos permiso (o estamos en iOS), procedemos a guardar
         try {
             const result = await PhotoSaver.savePhoto(this.state.photo.urls.raw);
             Alert.alert("Éxito", result);
