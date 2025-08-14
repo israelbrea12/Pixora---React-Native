@@ -5,8 +5,8 @@
 //  Created by Israel Brea Piñero on 14/8/25.
 //
 
-#ifndef PixoraRN_Bridging_Header_h
-#define PixoraRN_Bridging_Header_h
+#import "React/RCTBridgeModule.h"
 
-
-#endif /* PixoraRN_Bridging_Header_h */
+// Tu clase debe implementar el protocolo RCTBridgeModule para ser un módulo nativo.
+@interface PhotoSaver : NSObject <RCTBridgeModule>
+@end

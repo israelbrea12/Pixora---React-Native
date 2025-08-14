@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, ScrollView, Image, ActivityIndicator, TouchableOpacity, SafeAreaView, Dimensions, Animated } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, Image, ActivityIndicator, TouchableOpacity, SafeAreaView, Dimensions, Animated, NativeModules, Alert, PermissionsAndroid, Platform, Linking } from 'react-native';
 import UnsplashApiClient, { Photo } from '../api/UnsplashApiClient';
 import { PhotoDetailsScreenProps } from '../navigation/types';
 import Ionicon from 'react-native-vector-icons/Ionicons';
@@ -8,6 +8,12 @@ import { addFavorite, removeFavorite, isFavorite } from '../services/DatabaseMan
 
 
 const AnimatedIonicon = Animated.createAnimatedComponent(Ionicon);
+
+interface PhotoSaverInterface {
+    savePhoto(url: string): Promise<string>;
+}
+
+const PhotoSaver = NativeModules.PhotoSaver as PhotoSaverInterface;
 
 // Estado local para la vista, incluyendo el estado de la UI
 interface PhotoDetailsState {
@@ -132,6 +138,52 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
         this.props.navigation.navigate('SaveToList', { photo });
     };
 
+    private handleSavePhoto = async () => {
+        if (Platform.OS === 'android') {
+            try {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                    {
+                        title: "Permiso para guardar fotos",
+                        message: "Esta app necesita acceso a tu almacenamiento para descargar la imagen.",
+                        buttonPositive: "Aceptar",
+                        buttonNegative: "Cancelar"
+                    }
+                );
+
+                if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                    // Si el permiso fue otorgado, no hacemos nada aquí y dejamos que el código de abajo se ejecute.
+                    console.log("Permiso de almacenamiento concedido.");
+                } else if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+                    // El usuario denegó el permiso y marcó "No volver a preguntar".
+                    Alert.alert(
+                        "Permiso denegado permanentemente",
+                        "Has denegado el permiso para guardar fotos. Por favor, ve a los ajustes de la app para habilitarlo.",
+                        [
+                            { text: "Cancelar", style: "cancel" },
+                            { text: "Abrir Ajustes", onPress: () => Linking.openSettings() } // Abre los ajustes de la app
+                        ]
+                    );
+                    return; // Detenemos la ejecución
+                } else {
+                    // El usuario simplemente denegó el permiso esta vez.
+                    Alert.alert("Permiso denegado", "No puedes guardar la foto sin aceptar el permiso.");
+                    return; // Detenemos la ejecución
+                }
+            } catch (err) {
+                console.warn(err);
+                return;
+            }
+        }
+
+        // El resto de la lógica (llamar a PhotoSaver.savePhoto) solo se ejecuta si los permisos están OK
+        try {
+            const result = await PhotoSaver.savePhoto(this.state.photo.urls.raw);
+            Alert.alert("Éxito", result);
+        } catch (error: any) {
+            Alert.alert("Error al guardar", error.message);
+        }
+    };
     // --- Sub-componentes de renderizado ---
 
     private renderInteractionBar(photo: Photo) {
@@ -159,6 +211,10 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
                     </TouchableOpacity>
                     <Text style={styles.likesText}>{photo.likes.toLocaleString()}</Text>
                 </View>
+
+                <TouchableOpacity onPress={this.handleSavePhoto}>
+                    <Ionicon name="download-outline" size={28} color="#333" />
+                </TouchableOpacity>
 
                 {/* Envolvemos el botón en un Animated.View para poder animarlo */}
                 <Animated.View style={animatedSaveButtonStyle}>
