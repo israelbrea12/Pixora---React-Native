@@ -1,0 +1,68 @@
+// src/i18n/en.js
+export default {
+    // App.tsx (MainTabs & Modals)
+    home: 'Home',
+    search: 'Search',
+    add: 'Add',
+    activity: 'Activity',
+    profile: 'Profile',
+    saveTo: 'Save to...',
+    openSettings: 'Open Settings',
+
+    // HomeScreen.tsx
+    pixora: 'Pixora',
+    popular: 'Popular',
+    nature: 'Nature',
+    technology: 'Technology',
+    animals: 'Animals',
+    food: 'Food',
+
+    // SearchPhotosList.tsx
+    searchPhotosPlaceholder: 'Search photos...',
+
+    // PhotoDetails.tsx
+    savePermissionTitle: 'Permission to save photos',
+    savePermissionMessage: 'This app needs access to your gallery to download the image.',
+    accept: 'Accept',
+    cancel: 'Cancel',
+    permissionDenied: 'Permission denied',
+    permissionDeniedMessage: 'You cannot save the photo without accepting the permission.',
+    permissionPermanentlyDenied: 'Permission permanently denied',
+    permissionPermanentlyDeniedMessage: 'To save photos, you need to enable storage permission from the app settings.',
+    success: 'Success',
+    saveError: 'Error saving',
+    saved: 'Saved',
+    save: 'Save',
+    photoSavedSuccess: 'Photo saved to gallery! 🎉',
+
+    // ProfileScreen.tsx
+    myPhotos: 'My Photos',
+    lists: 'Lists',
+    favorites: 'Favorites',
+    myProfile: 'My Profile',
+    comingSoon: 'Coming soon',
+    viewMode: 'View Mode',
+    language: 'Language',
+    mosaic: 'Mosaic',
+    list: 'List',
+
+    // ListsScreen.tsx
+    noListsYet: "You haven't created any lists yet.",
+
+    // SaveToListScreen.tsx
+    error: 'Error',
+    listExistsError: 'A list with that name already exists.',
+    photoSavedToList: 'Photo has been added to "{listName}".',
+    photoSaveError: 'Could not save photo to the list.',
+    createNewList: 'Create new list',
+    newList: 'New List',
+    newListMessage: 'Enter the name for your new list.',
+
+    // PromptModal.tsx
+    listNamePlaceholder: 'List name',
+    create: 'Create',
+
+    // PlaceholderScreen.tsx
+    screen: 'Screen',
+    underConstruction: 'Under construction 🏗️'
+};

@@ -5,6 +5,7 @@ import { PhotoDetailsScreenProps } from '../navigation/types';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { isPhotoSaved } from '../services/DatabaseManager';
 import { addFavorite, removeFavorite, isFavorite } from '../services/DatabaseManager';
+import i18n from '../i18n';
 
 
 const AnimatedIonicon = Animated.createAnimatedComponent(Ionicon);
@@ -139,38 +140,33 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
     };
 
     private handleSavePhoto = async () => {
-        // La lógica de permisos ahora depende de la versión de Android
         if (Platform.OS === 'android') {
             try {
-                // Comprobamos si la versión de Android es 13 o superior
                 const isAndroid13OrUp = Platform.Version >= 33;
-
-                // Definimos el permiso a solicitar
                 const permission = isAndroid13OrUp
                     ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
                     : PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE;
 
                 const granted = await PermissionsAndroid.request(permission, {
-                    title: "Permiso para guardar fotos",
-                    message: "Esta app necesita acceso a tu galería para descargar la imagen.",
-                    buttonPositive: "Aceptar",
-                    buttonNegative: "Cancelar"
+                    title: i18n.t('savePermissionTitle'),
+                    message: i18n.t('savePermissionMessage'),
+                    buttonPositive: i18n.t('accept'),
+                    buttonNegative: i18n.t('cancel'),
                 });
 
                 if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-                    Alert.alert("Permiso denegado", "No puedes guardar la foto sin aceptar el permiso.");
-                    // Comprobamos si el usuario denegó permanentemente el permiso
+                    Alert.alert(i18n.t('permissionDenied'), i18n.t('permissionDeniedMessage'));
                     if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
                         Alert.alert(
-                            "Permiso denegado permanentemente",
-                            "Para guardar fotos, necesitas activar el permiso de almacenamiento desde los ajustes de la app.",
+                            i18n.t('permissionPermanentlyDenied'),
+                            i18n.t('permissionPermanentlyDeniedMessage'),
                             [
-                                { text: "Cancelar", style: "cancel" },
-                                { text: "Abrir Ajustes", onPress: () => Linking.openSettings() }
+                                { text: i18n.t('cancel'), style: "cancel" },
+                                { text: i18n.t('openSettings'), onPress: () => Linking.openSettings() }
                             ]
                         );
                     }
-                    return; // Detenemos la ejecución si no hay permiso
+                    return;
                 }
             } catch (err) {
                 console.warn(err);
@@ -178,12 +174,12 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
             }
         }
 
-        // Si tenemos permiso (o estamos en iOS), procedemos a guardar
         try {
+            // Usamos la clave de traducción que también está en el módulo nativo
             const result = await PhotoSaver.savePhoto(this.state.photo.urls.raw);
-            Alert.alert("Éxito", result);
+            Alert.alert(i18n.t('success'), result);
         } catch (error: any) {
-            Alert.alert("Error al guardar", error.message);
+            Alert.alert(i18n.t('saveError'), error.message);
         }
     };
     // --- Sub-componentes de renderizado ---
@@ -224,7 +220,7 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
                         onPress={this.openSaveToListScreen}
                         style={[styles.saveButton, isSaved && styles.saveButtonSaved]}
                     >
-                        <Text style={styles.saveButtonText}>{isSaved ? 'Guardado' : 'Guardar'}</Text>
+                        <Text style={styles.saveButtonText}>{isSaved ? i18n.t('saved') : i18n.t('save')}</Text>
                     </TouchableOpacity>
                 </Animated.View>
             </View>

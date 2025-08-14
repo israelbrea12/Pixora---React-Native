@@ -19,6 +19,7 @@ import ProfileScreen from './src/screens/ProfileScreen';
 import SaveToListScreen from './src/screens/SaveToListScreen';
 import PhotoListDetailScreen from './src/screens/PhotoListDetailScreen';
 import Ionicon from 'react-native-vector-icons/Ionicons';
+import i18n from './src/i18n';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -28,11 +29,11 @@ const Tab = createBottomTabNavigator<TabParamList>();
  */
 const MainTabs = () => (
   <Tab.Navigator screenOptions={{ headerShown: false }}>
-    <Tab.Screen name="HomeTab" component={HomeScreen} options={{ title: 'Inicio', tabBarIcon: ({ color, size }) => <Ionicon name="home" size={size} color={color} /> }} />
-    <Tab.Screen name="SearchTab" component={SearchPhotosList} options={{ title: 'Buscar', tabBarIcon: ({ color, size }) => <Ionicon name="search" size={size} color={color} /> }} />
-    <Tab.Screen name="AddTab" component={PlaceholderScreen} options={{ title: 'Añadir', tabBarIcon: ({ color, size }) => <Ionicon name="add-circle" size={size} color={color} /> }} />
-    <Tab.Screen name="ActivityTab" component={PlaceholderScreen} options={{ title: 'Actividad', tabBarIcon: ({ color, size }) => <Ionicon name="heart" size={size} color={color} /> }} />
-    <Tab.Screen name="SettingsTab" component={ProfileScreen} options={{ title: 'Perfil', tabBarIcon: ({ color, size }) => <Ionicon name="person-circle" size={size} color={color} /> }} />
+    <Tab.Screen name="HomeTab" component={HomeScreen} options={{ title: i18n.t('home'), tabBarIcon: ({ color, size }) => <Ionicon name="home" size={size} color={color} /> }} />
+    <Tab.Screen name="SearchTab" component={SearchPhotosList} options={{ title: i18n.t('search'), tabBarIcon: ({ color, size }) => <Ionicon name="search" size={size} color={color} /> }} />
+    <Tab.Screen name="AddTab" component={PlaceholderScreen} options={{ title: i18n.t('add'), tabBarIcon: ({ color, size }) => <Ionicon name="add-circle" size={size} color={color} /> }} />
+    <Tab.Screen name="ActivityTab" component={PlaceholderScreen} options={{ title: i18n.t('activity'), tabBarIcon: ({ color, size }) => <Ionicon name="heart" size={size} color={color} /> }} />
+    <Tab.Screen name="SettingsTab" component={ProfileScreen} options={{ title: i18n.t('profile'), tabBarIcon: ({ color, size }) => <Ionicon name="person-circle" size={size} color={color} /> }} />
   </Tab.Navigator>
 );
 
@@ -57,7 +58,7 @@ export default class App extends Component {
 
               {/* Pantallas que se presentan como un modal */}
               <RootStack.Group screenOptions={{ presentation: 'modal' }}>
-                <RootStack.Screen name="SaveToList" component={SaveToListScreen} options={{ title: 'Guardar en...' }} />
+                <RootStack.Screen name="SaveToList" component={SaveToListScreen} options={{ title: i18n.t('saveTo') }} />
               </RootStack.Group>
             </RootStack.Navigator>
           </NavigationContainer>

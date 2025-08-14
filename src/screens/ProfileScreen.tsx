@@ -17,6 +17,7 @@ import {
     MenuTrigger,
 } from 'react-native-popup-menu';
 import { ProfileTabParamList } from '../navigation/types';
+import i18n from '../i18n';
 
 const TopTab = createMaterialTopTabNavigator<ProfileTabParamList>();
 
@@ -36,16 +37,16 @@ const ProfileTabNavigator = () => (
             tabBarIndicatorStyle: { backgroundColor: '#000' },
         }}
     >
-        <TopTab.Screen name="MyPhotos" component={PlaceholderScreen} options={{ title: 'Mis Fotos' }} initialParams={{ title: 'Mis Fotos' }} />
+        <TopTab.Screen name="MyPhotos" component={PlaceholderScreen} options={{ title: i18n.t('myPhotos') }} initialParams={{ title: i18n.t('myPhotos') }} />
         <TopTab.Screen
             name="Lists"
             component={ListsScreen}
-            options={{ title: 'Listas' }}
+            options={{ title: i18n.t('lists') }}
         />
         <TopTab.Screen
             name="Favorites"
             component={FavoritesScreen}
-            options={{ title: 'Favoritos' }}
+            options={{ title: i18n.t('favorites') }}
         />
     </TopTab.Navigator>
 );
@@ -76,7 +77,7 @@ export default class ProfileScreen extends Component<{}, ProfileScreenState> {
                         <SafeAreaView style={styles.safeArea}>
                             <View style={styles.topBarContainer}>
                                 <View style={styles.topBarLeft} />
-                                <Text style={styles.topBarTitle}>Mi Perfil</Text>
+                                <Text style={styles.topBarTitle}>{i18n.t('myProfile')}</Text>
                                 <View style={styles.topBarActions}>
                                     <TouchableOpacity onPress={() => { /* TODO */ }}>
                                         <Ionicon name="person-circle-outline" size={30} color="#333" style={styles.actionIcon} />
@@ -91,14 +92,14 @@ export default class ProfileScreen extends Component<{}, ProfileScreenState> {
                                                     <MenuOption onSelect={this.showLayoutMenu}>
                                                         <View style={styles.menuItem}>
                                                             <Ionicon name="grid-outline" size={22} color="#333" />
-                                                            <Text style={styles.menuItemText}>Modo de visualización</Text>
+                                                            <Text style={styles.menuItemText}>{i18n.t('viewMode')}</Text>
                                                         </View>
                                                     </MenuOption>
                                                     {/* --- CAMBIO 5: Usamos Alert.alert --- */}
-                                                    <MenuOption onSelect={() => Alert.alert('Próximamente')}>
+                                                    <MenuOption onSelect={() => Alert.alert(i18n.t('comingSoon'))}>
                                                         <View style={styles.menuItem}>
                                                             <Ionicon name="language-outline" size={22} color="#333" />
-                                                            <Text style={styles.menuItemText}>Idioma</Text>
+                                                            <Text style={styles.menuItemText}>{i18n.t('language')}</Text>
                                                         </View>
                                                     </MenuOption>
                                                 </>
@@ -108,19 +109,19 @@ export default class ProfileScreen extends Component<{}, ProfileScreenState> {
                                                     <MenuOption onSelect={this.openMenu}>
                                                         <View style={styles.menuItem}>
                                                             <Ionicon name="arrow-back" size={22} color="#333" />
-                                                            <Text style={[styles.menuItemText, { fontWeight: 'bold' }]}>Modo de visualización</Text>
+                                                            <Text style={styles.menuItemText}>{i18n.t('viewMode')}</Text>
                                                         </View>
                                                     </MenuOption>
                                                     <View style={styles.divider} />
                                                     <MenuOption onSelect={() => handleSelectLayoutMode('masonry')}>
                                                         <View style={styles.menuItem}>
-                                                            <Text style={styles.menuItemText}>Mosaico</Text>
+                                                            <Text style={styles.menuItemText}>{i18n.t('mosaic')}</Text>
                                                             {layoutMode === 'masonry' && <Ionicon name="checkmark" size={22} color="#007AFF" />}
                                                         </View>
                                                     </MenuOption>
                                                     <MenuOption onSelect={() => handleSelectLayoutMode('list')}>
                                                         <View style={styles.menuItem}>
-                                                            <Text style={styles.menuItemText}>Lista</Text>
+                                                            <Text style={styles.menuItemText}>{i18n.t('list')}</Text>
                                                             {layoutMode === 'list' && <Ionicon name="checkmark" size={22} color="#007AFF" />}
                                                         </View>
                                                     </MenuOption>

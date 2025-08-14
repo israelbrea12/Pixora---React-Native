@@ -3,6 +3,7 @@ import { TextInput, StyleSheet, View } from 'react-native';
 import PhotoList, { PhotoListState } from './PhotoList';
 import { Photo } from '../api/UnsplashApiClient';
 import { SearchScreenProps } from '../navigation/types';
+import i18n from '../i18n';
 
 interface SearchablePhotoListState extends PhotoListState {
     query: string;
@@ -20,7 +21,7 @@ export default class SearchPhotosList extends PhotoList<SearchScreenProps, Searc
     public constructor(props: SearchScreenProps) {
         super(props);
         props.navigation.setOptions({
-            title: 'Buscar',
+            title: i18n.t('search'),
         });
     }
 
@@ -72,7 +73,7 @@ export default class SearchPhotosList extends PhotoList<SearchScreenProps, Searc
             <View style={styles.searchContainer}>
                 <TextInput
                     style={styles.searchInput}
-                    placeholder="Busca fotos..."
+                    placeholder={i18n.t('searchPhotosPlaceholder')}
                     value={this.state.query}
                     onChangeText={this.onQueryChanged}
                     onSubmitEditing={this.handleSearch}

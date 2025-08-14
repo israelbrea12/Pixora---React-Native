@@ -1,6 +1,7 @@
 // src/components/PromptModal.tsx
 import React, { useState } from 'react';
 import { Modal, View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import i18n from '../i18n';
 
 interface PromptModalProps {
     visible: boolean;
@@ -33,15 +34,15 @@ const PromptModal = ({ visible, title, message, onCancel, onSubmit }: PromptModa
                         style={styles.input}
                         onChangeText={setInputText}
                         value={inputText}
-                        placeholder="Nombre de la lista"
+                        placeholder={i18n.t('listNamePlaceholder')}
                         autoFocus={true}
                     />
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity onPress={onCancel}>
-                            <Text style={styles.buttonText}>Cancelar</Text>
+                            <Text style={styles.buttonText}>{i18n.t('cancel')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={handleSubmit}>
-                            <Text style={[styles.buttonText, { fontWeight: 'bold' }]}>Crear</Text>
+                            <Text style={[styles.buttonText, { fontWeight: 'bold' }]}>{i18n.t('create')}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

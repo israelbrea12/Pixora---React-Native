@@ -6,8 +6,15 @@ import PhotoList, { PhotoListState } from './PhotoList';
 import { Photo } from '../api/UnsplashApiClient';
 // --- CAMBIO 1: Importamos el tipo de props específico para esta pantalla ---
 import { HomeScreenProps } from '../navigation/types';
+import i18n from '../i18n';
 
-const CATEGORIES = ['Popular', 'Nature', 'Technology', 'Animals', 'Food'];
+const CATEGORIES = [
+    { key: 'Popular', title: i18n.t('popular') },
+    { key: 'Nature', title: i18n.t('nature') },
+    { key: 'Technology', title: i18n.t('technology') },
+    { key: 'Animals', title: i18n.t('animals') },
+    { key: 'Food', title: i18n.t('food') }
+];
 
 interface HomeState extends PhotoListState {
     selectedCategory: string;
@@ -17,14 +24,14 @@ interface HomeState extends PhotoListState {
 export default class HomeScreen extends PhotoList<HomeScreenProps, HomeState> {
     public state: HomeState = {
         photos: [],
-        selectedCategory: CATEGORIES[0],
+        selectedCategory: CATEGORIES[0].key,
     };
 
     // --- CAMBIO 3: El constructor ahora espera recibir HomeScreenProps ---
     public constructor(props: HomeScreenProps) {
         super(props);
         props.navigation.setOptions({
-            title: 'Pixora',
+            title: i18n.t('pixora'),
         });
     }
 
@@ -54,18 +61,18 @@ export default class HomeScreen extends PhotoList<HomeScreenProps, HomeState> {
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     {CATEGORIES.map(category => (
                         <TouchableOpacity
-                            key={category}
+                            key={category.key}
                             style={[
                                 styles.categoryButton,
-                                this.state.selectedCategory === category && styles.categoryButtonSelected,
+                                this.state.selectedCategory === category.key && styles.categoryButtonSelected,
                             ]}
-                            onPress={() => this.onCategorySelected(category)}>
+                            onPress={() => this.onCategorySelected(category.key)}>
                             <Text
                                 style={[
                                     styles.categoryText,
-                                    this.state.selectedCategory === category && styles.categoryTextSelected,
+                                    this.state.selectedCategory === category.key && styles.categoryTextSelected,
                                 ]}>
-                                {category}
+                                {category.title}
                             </Text>
                         </TouchableOpacity>
                     ))}

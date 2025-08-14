@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import i18n from '../i18n';
 
 
 // 1. Hacemos que las props sean opcionales usando el signo '?'
@@ -16,12 +17,12 @@ interface PlaceholderProps {
 const PlaceholderScreen = (props: PlaceholderProps) => {
     // 2. Usamos "encadenamiento opcional" (?.) para acceder al título de forma segura
     // y le damos un valor por defecto por si no viniera nada.
-    const title = props.route?.params?.title || 'Pantalla';
+    const title = props.route?.params?.title || i18n.t('screen');
 
     return (
         <View style={styles.container}>
             <Text style={styles.text}>{title}</Text>
-            <Text style={styles.subtitle}>En construcción 🏗️</Text>
+            <Text style={styles.subtitle}>{i18n.t('underConstruction')}</Text>
         </View>
     );
 };

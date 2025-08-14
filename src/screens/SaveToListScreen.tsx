@@ -5,6 +5,7 @@ import { SaveToListScreenProps } from '../navigation/types';
 import { PhotoListInfo, getPhotoLists, createPhotoList, addPhotoToList } from '../services/DatabaseManager';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import PromptModal from '../components/PromptModal';
+import i18n from '../i18n';
 
 interface State {
     lists: PhotoListInfo[];
@@ -20,7 +21,7 @@ export default class SaveToListScreen extends Component<SaveToListScreenProps, S
 
     componentDidMount() {
         // Ponemos un título al modal
-        this.props.navigation.setOptions({ title: 'Guardar en...' });
+        this.props.navigation.setOptions({ title: i18n.t('saveTo') });
         this.fetchLists();
     }
 
@@ -40,7 +41,7 @@ export default class SaveToListScreen extends Component<SaveToListScreenProps, S
                 await createPhotoList(name.trim());
                 this.fetchLists(); // Refrescamos la lista
             } catch (e) {
-                Alert.alert("Error", "Ya existe una lista con ese nombre.");
+                Alert.alert(i18n.t('error'), i18n.t('listExistsError'));
             }
         }
     };
@@ -49,10 +50,10 @@ export default class SaveToListScreen extends Component<SaveToListScreenProps, S
         const { photo } = this.props.route.params;
         try {
             await addPhotoToList(list.id, photo);
-            Alert.alert("Guardado", `La foto se ha añadido a "${list.name}".`);
+            Alert.alert(i18n.t('saved'), i18n.t('photoSavedToList', { listName: list.name }));
             this.props.navigation.goBack();
         } catch (e) {
-            Alert.alert("Error", "No se pudo guardar la foto en la lista.");
+            Alert.alert(i18n.t('error'), i18n.t('photoSaveError'));
         }
     };
 
@@ -70,14 +71,14 @@ export default class SaveToListScreen extends Component<SaveToListScreenProps, S
                     ListHeaderComponent={
                         <TouchableOpacity style={styles.itemContainer} onPress={this.handleCreateList}>
                             <Ionicon name="add" size={24} color="#007AFF" />
-                            <Text style={[styles.itemTitle, { color: '#007AFF', fontWeight: 'bold' }]}>Crear nueva lista</Text>
+                            <Text style={[styles.itemTitle, { color: '#007AFF', fontWeight: 'bold' }]}>{i18n.t('createNewList')}</Text>
                         </TouchableOpacity>
                     }
                 />
                 <PromptModal
                     visible={this.state.isPromptVisible}
-                    title="Nueva Lista"
-                    message="Introduce el nombre para tu nueva lista."
+                    title={i18n.t('newList')}
+                    message={i18n.t('newListMessage')}
                     onCancel={() => this.setState({ isPromptVisible: false })}
                     onSubmit={this.submitNewList}
                 />

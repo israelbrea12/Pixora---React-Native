@@ -7,6 +7,7 @@ import { MaterialTopTabScreenProps } from '@react-navigation/material-top-tabs';
 import { ProfileTabParamList, RootStackParamList } from '../navigation/types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ListsScreenProps } from '../navigation/types';
+import i18n from '../i18n';
 
 interface State {
     lists: PhotoListInfo[];
@@ -60,7 +61,7 @@ export default class ListsScreen extends Component<ListsScreenProps, State> {
                         <Text style={styles.itemText}>{item.name}</Text>
                     </TouchableOpacity>
                 )}
-                ListEmptyComponent={<Text style={styles.emptyText}>Aún no has creado ninguna lista.</Text>}
+                ListEmptyComponent={<Text style={styles.emptyText}>{i18n.t('noListsYet')}</Text>}
             />
         );
     }
