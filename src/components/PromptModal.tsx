@@ -1,7 +1,7 @@
 // src/components/PromptModal.tsx
 import React, { useState } from 'react';
 import { Modal, View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
-import i18n from '../i18n';
+import i18n from '../i18n/LocalizationManager';
 
 interface PromptModalProps {
     visible: boolean;

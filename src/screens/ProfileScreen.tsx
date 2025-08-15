@@ -9,20 +9,21 @@ import PlaceholderScreen from './PlaceholderScreen';
 import FavoritesScreen from './FavoritesScreen';
 import ListsScreen from './ListsScreen';
 import { LayoutContext } from '../context/LayoutContext';
-import { LayoutMode } from '../services/PreferencesManager';
+import { LayoutMode, Language } from '../services/PreferencesManager';
 import {
     Menu,
     MenuOptions,
     MenuOption,
     MenuTrigger,
 } from 'react-native-popup-menu';
-import { ProfileTabParamList } from '../navigation/types';
-import i18n from '../i18n';
+import { ProfileTabParamList, ProfileScreenProps } from '../navigation/types';
+import { setLanguage } from '../i18n/LocalizationManager';
+import i18n from '../i18n/LocalizationManager';
 
 const TopTab = createMaterialTopTabNavigator<ProfileTabParamList>();
 
 // --- Definimos los estados posibles del menú ---
-type MenuState = 'hidden' | 'main' | 'layout';
+type MenuState = 'hidden' | 'main' | 'layout' | 'language';
 
 // --- CAMBIO 2: Unificamos la definición del estado del componente ---
 interface ProfileScreenState {
@@ -51,10 +52,7 @@ const ProfileTabNavigator = () => (
     </TopTab.Navigator>
 );
 
-export default class ProfileScreen extends Component<{}, ProfileScreenState> {
-    // --- CAMBIO 3: Eliminamos 'declare context' y 'static contextType' para evitar el error de Babel ---
-
-    // El estado ahora coincide con nuestra interfaz unificada
+export default class ProfileScreen extends Component<ProfileScreenProps, ProfileScreenState> {
     state: ProfileScreenState = {
         menuState: 'hidden',
     };
@@ -62,6 +60,7 @@ export default class ProfileScreen extends Component<{}, ProfileScreenState> {
     openMenu = () => this.setState({ menuState: 'main' });
     closeMenu = () => this.setState({ menuState: 'hidden' });
     showLayoutMenu = () => this.setState({ menuState: 'layout' });
+    showLanguageMenu = () => this.setState({ menuState: 'language' });
 
     render() {
         return (
@@ -70,6 +69,10 @@ export default class ProfileScreen extends Component<{}, ProfileScreenState> {
                 {({ layoutMode, setLayoutMode }) => {
                     const handleSelectLayoutMode = (mode: LayoutMode) => {
                         setLayoutMode(mode);
+                        this.closeMenu();
+                    };
+                    const handleSelectLanguage = (lang: Language) => {
+                        setLanguage(lang);
                         this.closeMenu();
                     };
 
@@ -96,7 +99,7 @@ export default class ProfileScreen extends Component<{}, ProfileScreenState> {
                                                         </View>
                                                     </MenuOption>
                                                     {/* --- CAMBIO 5: Usamos Alert.alert --- */}
-                                                    <MenuOption onSelect={() => Alert.alert(i18n.t('comingSoon'))}>
+                                                    <MenuOption onSelect={this.showLanguageMenu}>
                                                         <View style={styles.menuItem}>
                                                             <Ionicon name="language-outline" size={22} color="#333" />
                                                             <Text style={styles.menuItemText}>{i18n.t('language')}</Text>
@@ -123,6 +126,29 @@ export default class ProfileScreen extends Component<{}, ProfileScreenState> {
                                                         <View style={styles.menuItem}>
                                                             <Text style={styles.menuItemText}>{i18n.t('list')}</Text>
                                                             {layoutMode === 'list' && <Ionicon name="checkmark" size={22} color="#007AFF" />}
+                                                        </View>
+                                                    </MenuOption>
+                                                </>
+                                            )}
+                                            {this.state.menuState === 'language' && (
+                                                <>
+                                                    <MenuOption onSelect={this.openMenu}>
+                                                        <View style={styles.menuItem}>
+                                                            <Ionicon name="arrow-back" size={22} color="#333" />
+                                                            <Text style={[styles.menuItemText, { fontWeight: 'bold' }]}>{i18n.t('language')}</Text>
+                                                        </View>
+                                                    </MenuOption>
+                                                    <View style={styles.divider} />
+                                                    <MenuOption onSelect={() => handleSelectLanguage('es')}>
+                                                        <View style={styles.menuItem}>
+                                                            <Text style={styles.menuItemText}>Español</Text>
+                                                            {i18n.locale === 'es' && <Ionicon name="checkmark" size={22} color="#007AFF" />}
+                                                        </View>
+                                                    </MenuOption>
+                                                    <MenuOption onSelect={() => handleSelectLanguage('en')}>
+                                                        <View style={styles.menuItem}>
+                                                            <Text style={styles.menuItemText}>English</Text>
+                                                            {i18n.locale === 'en' && <Ionicon name="checkmark" size={22} color="#007AFF" />}
                                                         </View>
                                                     </MenuOption>
                                                 </>

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import i18n from '../i18n';
+import i18n from '../i18n/LocalizationManager';
 
 
 // 1. Hacemos que las props sean opcionales usando el signo '?'

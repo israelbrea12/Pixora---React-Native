@@ -5,7 +5,7 @@ import { SaveToListScreenProps } from '../navigation/types';
 import { PhotoListInfo, getPhotoLists, createPhotoList, addPhotoToList } from '../services/DatabaseManager';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import PromptModal from '../components/PromptModal';
-import i18n from '../i18n';
+import i18n from '../i18n/LocalizationManager';
 
 interface State {
     lists: PhotoListInfo[];

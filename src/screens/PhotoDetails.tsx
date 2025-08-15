@@ -5,7 +5,7 @@ import { PhotoDetailsScreenProps } from '../navigation/types';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { isPhotoSaved } from '../services/DatabaseManager';
 import { addFavorite, removeFavorite, isFavorite } from '../services/DatabaseManager';
-import i18n from '../i18n';
+import i18n from '../i18n/LocalizationManager';
 
 
 const AnimatedIonicon = Animated.createAnimatedComponent(Ionicon);

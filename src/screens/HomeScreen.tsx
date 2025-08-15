@@ -6,14 +6,14 @@ import PhotoList, { PhotoListState } from './PhotoList';
 import { Photo } from '../api/UnsplashApiClient';
 // --- CAMBIO 1: Importamos el tipo de props específico para esta pantalla ---
 import { HomeScreenProps } from '../navigation/types';
-import i18n from '../i18n';
+import i18n from '../i18n/LocalizationManager';
 
 const CATEGORIES = [
-    { key: 'Popular', title: i18n.t('popular') },
-    { key: 'Nature', title: i18n.t('nature') },
-    { key: 'Technology', title: i18n.t('technology') },
-    { key: 'Animals', title: i18n.t('animals') },
-    { key: 'Food', title: i18n.t('food') }
+    { key: 'Popular', title: 'popular' },
+    { key: 'Nature', title: 'nature' },
+    { key: 'Technology', title: 'technology' },
+    { key: 'Animals', title: 'animals' },
+    { key: 'Food', title: 'food' }
 ];
 
 interface HomeState extends PhotoListState {
@@ -72,7 +72,7 @@ export default class HomeScreen extends PhotoList<HomeScreenProps, HomeState> {
                                     styles.categoryText,
                                     this.state.selectedCategory === category.key && styles.categoryTextSelected,
                                 ]}>
-                                {category.title}
+                                {i18n.t(category.title)}
                             </Text>
                         </TouchableOpacity>
                     ))}

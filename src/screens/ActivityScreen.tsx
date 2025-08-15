@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator, SafeAreaView } from 'react-native';
 import { getActivities, UserActivity } from '../services/DatabaseManager';
 import { ActivityScreenProps } from '../navigation/types';
-import i18n from '../i18n';
+import i18n from '../i18n/LocalizationManager';
 
 // --- Componente para un item de la lista de actividad ---
 const ActivityItem = ({ item }: { item: UserActivity }) => {

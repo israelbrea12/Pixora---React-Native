@@ -7,7 +7,7 @@ import { MaterialTopTabScreenProps } from '@react-navigation/material-top-tabs';
 import { ProfileTabParamList, RootStackParamList } from '../navigation/types';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ListsScreenProps } from '../navigation/types';
-import i18n from '../i18n';
+import i18n from '../i18n/LocalizationManager';
 
 interface State {
     lists: PhotoListInfo[];

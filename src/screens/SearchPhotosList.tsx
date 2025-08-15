@@ -3,7 +3,7 @@ import { TextInput, StyleSheet, View } from 'react-native';
 import PhotoList, { PhotoListState } from './PhotoList';
 import { Photo } from '../api/UnsplashApiClient';
 import { SearchScreenProps } from '../navigation/types';
-import i18n from '../i18n';
+import i18n from '../i18n/LocalizationManager';
 
 interface SearchablePhotoListState extends PhotoListState {
     query: string;

@@ -9,9 +9,11 @@ import { LayoutProvider } from './src/context/LayoutContext';
 import { MenuProvider } from 'react-native-popup-menu';
 import { initDB } from './src/services/DatabaseManager';
 import Ionicon from 'react-native-vector-icons/Ionicons';
-import i18n from './src/i18n';
 
 import { RootStackParamList, TabParamList } from './src/navigation/types';
+// Update the import path below if the actual file name or folder structure is different (e.g., 'localizationManager' or 'localization-manager')
+import { initLocalization, onLanguageChange } from './src/i18n/LocalizationManager';
+import i18n from './src/i18n/LocalizationManager'; // Asegúrate de que la ruta sea correcta
 
 import HomeScreen from './src/screens/HomeScreen';
 import SearchPhotosList from './src/screens/SearchPhotosList';
@@ -24,6 +26,11 @@ import ActivityScreen from './src/screens/ActivityScreen';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
+
+interface AppState {
+  isReady: boolean;
+  appKey: number; // Esta clave forzará el re-renderizado
+}
 
 /**
  * Componente que define el navegador de pestañas inferior
@@ -38,17 +45,47 @@ const MainTabs = () => (
   </Tab.Navigator>
 );
 
-export default class App extends Component {
-  constructor(props: {}) {
+export default class App extends Component<{}, AppState> {
+
+  private unsubscribeFromLangChange?: () => void;
+
+  public constructor(props: {}) {
     super(props);
+    this.state = {
+      isReady: false,
+      appKey: 0, // Valor inicial
+    };
     initDB();
+    // Inicializamos la localización
+    initLocalization().then(() => {
+      this.setState({ isReady: true });
+    });
   }
 
-  render() {
+  public componentDidMount() {
+    // --- CAMBIO 3: Nos suscribimos a los cambios de idioma ---
+    this.unsubscribeFromLangChange = onLanguageChange(() => {
+      // Cuando el idioma cambia, incrementamos la clave para forzar un re-render
+      this.setState(prevState => ({ appKey: prevState.appKey + 1 }));
+    });
+  }
+
+  public componentWillUnmount() {
+    // Nos desuscribimos para evitar memory leaks
+    if (this.unsubscribeFromLangChange) {
+      this.unsubscribeFromLangChange();
+    }
+  }
+
+
+  public render() {
+    if (!this.state.isReady) {
+      return <View />;
+    }
     return (
-      <LayoutProvider>
-        <MenuProvider>
-          <NavigationContainer>
+      <NavigationContainer key={this.state.appKey}>
+        <LayoutProvider>
+          <MenuProvider>
             <RootStack.Navigator>
               {/* Pantalla principal que contiene todas las pestañas */}
               <RootStack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
@@ -62,9 +99,9 @@ export default class App extends Component {
                 <RootStack.Screen name="SaveToList" component={SaveToListScreen} options={{ title: i18n.t('saveTo') }} />
               </RootStack.Group>
             </RootStack.Navigator>
-          </NavigationContainer>
-        </MenuProvider>
-      </LayoutProvider>
+          </MenuProvider>
+        </LayoutProvider>
+      </NavigationContainer>
     );
   }
 }
