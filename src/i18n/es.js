@@ -53,7 +53,7 @@ export default {
     // SaveToListScreen.tsx
     error: 'Error',
     listExistsError: 'Ya existe una lista con ese nombre.',
-    photoSavedToList: 'La foto se ha añadido a "{listName}".',
+    photoSavedToList: 'La foto se ha añadido a "%{listName}".',
     photoSaveError: 'No se pudo guardar la foto en la lista.',
     createNewList: 'Crear nueva lista',
     newList: 'Nueva Lista',
@@ -65,5 +65,10 @@ export default {
 
     // PlaceholderScreen.tsx
     screen: 'Pantalla',
-    underConstruction: 'En construcción 🏗️'
+    underConstruction: 'En construcción 🏗️',
+
+    // ActivityScreen.tsx
+    activityLiked: 'Has dado me gusta a una foto',
+    activityAddedToList: 'Has añadido una foto a la lista "%{listName}"',
+    noActivityYet: 'No hay actividad todavía',
 };

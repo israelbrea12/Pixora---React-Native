@@ -49,7 +49,8 @@ export default class SaveToListScreen extends Component<SaveToListScreenProps, S
     handleSelectList = async (list: PhotoListInfo) => {
         const { photo } = this.props.route.params;
         try {
-            await addPhotoToList(list.id, photo);
+            // --- CAMBIO: Pasamos el nombre de la lista a la función ---
+            await addPhotoToList(list.id, photo, list.name);
             Alert.alert(i18n.t('saved'), i18n.t('photoSavedToList', { listName: list.name }));
             this.props.navigation.goBack();
         } catch (e) {

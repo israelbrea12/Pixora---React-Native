@@ -10,6 +10,17 @@ export type PhotoListInfo = {
     name: string;
 }
 
+// --- NUEVOS TIPOS: Para la actividad del usuario ---
+export type UserActivityType = 'LIKE' | 'ADD_TO_LIST';
+
+export interface UserActivity {
+    id: number;
+    type: UserActivityType;
+    timestamp: number; // Guardaremos la fecha como un número (milisegundos)
+    photo: Photo;
+    listName?: string; // Opcional, solo para 'ADD_TO_LIST'
+}
+
 export const initDB = (): void => {
     db.transaction(txn => {
         txn.executeSql(
@@ -29,6 +40,16 @@ export const initDB = (): void => {
                 photoData TEXT NOT NULL,
                 PRIMARY KEY (listId, photoId),
                 FOREIGN KEY (listId) REFERENCES PhotoLists(id) ON DELETE CASCADE
+            )`,
+            []
+        );
+        txn.executeSql(
+            `CREATE TABLE IF NOT EXISTS UserActivity (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                type TEXT NOT NULL,
+                timestamp INTEGER NOT NULL,
+                photoData TEXT NOT NULL,
+                listName TEXT
             )`,
             []
         );
@@ -59,15 +80,16 @@ export const getPhotoLists = (): Promise<PhotoListInfo[]> => {
     });
 };
 
-export const addPhotoToList = (listId: number, photo: Photo): Promise<void> => {
+export const addPhotoToList = (listId: number, photo: Photo, listName: string): Promise<void> => {
     return new Promise((resolve, reject) => {
         db.transaction(txn => {
-            txn.executeSql(
-                'INSERT OR IGNORE INTO ListEntries (listId, photoId, photoData) VALUES (?, ?, ?)',
+            txn.executeSql('INSERT OR IGNORE INTO ListEntries (listId, photoId, photoData) VALUES (?, ?, ?)',
                 [listId, photo.id, JSON.stringify(photo)],
-                () => resolve(),
-                (_, err) => { reject(err); return false; }
-            );
+                async () => {
+                    await logActivity('ADD_TO_LIST', photo, listName); // Registramos que se guardó
+                    resolve();
+                },
+                (_, err) => { reject(err); return false; });
         });
     });
 };
@@ -112,7 +134,13 @@ export const getPhotosInList = (listId: number): Promise<Photo[]> => {
 export const addFavorite = (photo: Photo): Promise<void> => {
     return new Promise((resolve, reject) => {
         db.transaction(txn => {
-            txn.executeSql('INSERT OR REPLACE INTO Favorites (id, photoData) VALUES (?, ?)', [photo.id, JSON.stringify(photo)], () => resolve(), (_, error) => { reject(error); return false; });
+            txn.executeSql('INSERT OR REPLACE INTO Favorites (id, photoData) VALUES (?, ?)',
+                [photo.id, JSON.stringify(photo)],
+                async () => {
+                    await logActivity('LIKE', photo); // Registramos el "Me Gusta"
+                    resolve();
+                },
+                (_, error) => { reject(error); return false; });
         });
     });
 };
@@ -145,6 +173,47 @@ export const isFavorite = (photoId: string): Promise<boolean> => {
             txn.executeSql('SELECT id FROM Favorites WHERE id = ?', [photoId], (_, { rows }) => {
                 resolve(rows.length > 0);
             }, () => { resolve(false); return false; });
+        });
+    });
+};
+
+// --- NUEVAS FUNCIONES: Para registrar y obtener actividad ---
+
+const logActivity = (type: UserActivityType, photo: Photo, listName?: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        db.transaction(txn => {
+            txn.executeSql(
+                'INSERT INTO UserActivity (type, timestamp, photoData, listName) VALUES (?, ?, ?, ?)',
+                [type, Date.now(), JSON.stringify(photo), listName || null],
+                () => resolve(),
+                (_, err) => { reject(err); return false; }
+            );
+        });
+    });
+};
+
+export const getActivities = (): Promise<UserActivity[]> => {
+    return new Promise((resolve, reject) => {
+        db.transaction(txn => {
+            txn.executeSql(
+                'SELECT id, type, timestamp, photoData, listName FROM UserActivity ORDER BY timestamp DESC',
+                [],
+                (_, { rows }) => {
+                    const activities: UserActivity[] = [];
+                    for (let i = 0; i < rows.length; i++) {
+                        const item = rows.item(i);
+                        activities.push({
+                            id: item.id,
+                            type: item.type,
+                            timestamp: item.timestamp,
+                            photo: JSON.parse(item.photoData),
+                            listName: item.listName,
+                        });
+                    }
+                    resolve(activities);
+                },
+                (_, err) => { reject(err); return false; }
+            );
         });
     });
 };

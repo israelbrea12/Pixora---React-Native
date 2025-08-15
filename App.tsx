@@ -8,6 +8,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { LayoutProvider } from './src/context/LayoutContext';
 import { MenuProvider } from 'react-native-popup-menu';
 import { initDB } from './src/services/DatabaseManager';
+import Ionicon from 'react-native-vector-icons/Ionicons';
+import i18n from './src/i18n';
 
 import { RootStackParamList, TabParamList } from './src/navigation/types';
 
@@ -18,8 +20,7 @@ import PlaceholderScreen from './src/screens/PlaceholderScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import SaveToListScreen from './src/screens/SaveToListScreen';
 import PhotoListDetailScreen from './src/screens/PhotoListDetailScreen';
-import Ionicon from 'react-native-vector-icons/Ionicons';
-import i18n from './src/i18n';
+import ActivityScreen from './src/screens/ActivityScreen';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -32,7 +33,7 @@ const MainTabs = () => (
     <Tab.Screen name="HomeTab" component={HomeScreen} options={{ title: i18n.t('home'), tabBarIcon: ({ color, size }) => <Ionicon name="home" size={size} color={color} /> }} />
     <Tab.Screen name="SearchTab" component={SearchPhotosList} options={{ title: i18n.t('search'), tabBarIcon: ({ color, size }) => <Ionicon name="search" size={size} color={color} /> }} />
     <Tab.Screen name="AddTab" component={PlaceholderScreen} options={{ title: i18n.t('add'), tabBarIcon: ({ color, size }) => <Ionicon name="add-circle" size={size} color={color} /> }} />
-    <Tab.Screen name="ActivityTab" component={PlaceholderScreen} options={{ title: i18n.t('activity'), tabBarIcon: ({ color, size }) => <Ionicon name="heart" size={size} color={color} /> }} />
+    <Tab.Screen name="ActivityTab" component={ActivityScreen} options={{ title: i18n.t('activity'), tabBarIcon: ({ color, size }) => <Ionicon name="heart" size={size} color={color} /> }} />
     <Tab.Screen name="SettingsTab" component={ProfileScreen} options={{ title: i18n.t('profile'), tabBarIcon: ({ color, size }) => <Ionicon name="person-circle" size={size} color={color} /> }} />
   </Tab.Navigator>
 );
