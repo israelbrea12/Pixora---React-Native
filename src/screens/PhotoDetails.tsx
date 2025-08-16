@@ -22,6 +22,7 @@ interface PhotoDetailsState {
     isLoading: boolean;
     isFavorite: boolean; // Para simular si es favorito
     isSaved: boolean;    // Para simular si está guardado
+    isDownloading: boolean;
 }
 
 export default class PhotoDetails extends Component<PhotoDetailsScreenProps, PhotoDetailsState> {
@@ -43,6 +44,7 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
             isLoading: true,
             isFavorite: false, // Valor inicial para la demo
             isSaved: false,    // Valor inicial para la demo
+            isDownloading: false,
         };
 
         // Ya no necesitamos setOptions para el título porque el header está oculto
@@ -140,6 +142,10 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
     };
 
     private handleSavePhoto = async () => {
+
+        if (this.state.isDownloading) return;
+        this.setState({ isDownloading: true });
+
         if (Platform.OS === 'android') {
             try {
                 const isAndroid13OrUp = Platform.Version >= 33;
@@ -166,26 +172,30 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
                             ]
                         );
                     }
+                    this.setState({ isDownloading: false });
                     return;
                 }
             } catch (err) {
                 console.warn(err);
+                this.setState({ isDownloading: false });
                 return;
             }
         }
 
         try {
-            // Usamos la clave de traducción que también está en el módulo nativo
             const result = await PhotoSaver.savePhoto(this.state.photo.urls.raw);
             Alert.alert(i18n.t('success'), result);
         } catch (error: any) {
             Alert.alert(i18n.t('saveError'), error.message);
+        } finally {
+            // Haya éxito o error, paramos la descarga
+            this.setState({ isDownloading: false });
         }
     };
     // --- Sub-componentes de renderizado ---
 
     private renderInteractionBar(photo: Photo) {
-        const { isFavorite, isSaved } = this.state;
+        const { isFavorite, isSaved, isDownloading } = this.state;
 
         // --- CAMBIO 5: Aplicamos los estilos de transformación animados ---
         const animatedHeartStyle = {
@@ -197,9 +207,9 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
 
         return (
             <View style={styles.interactionBar}>
-                <View style={styles.likesContainer}>
-                    <TouchableOpacity onPress={this.toggleFavorite}>
-                        {/* Usamos nuestro AnimatedIonicon y le aplicamos el estilo */}
+                <View style={styles.leftActions}>
+                    {/* Likes */}
+                    <TouchableOpacity onPress={this.toggleFavorite} style={styles.actionButton}>
                         <AnimatedIonicon
                             name={isFavorite ? 'heart' : 'heart-outline'}
                             size={28}
@@ -208,13 +218,18 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
                         />
                     </TouchableOpacity>
                     <Text style={styles.likesText}>{photo.likes.toLocaleString()}</Text>
+
+                    {/* Descargar */}
+                    <TouchableOpacity onPress={this.handleSavePhoto} style={styles.actionButton} disabled={isDownloading}>
+                        {isDownloading ? (
+                            <ActivityIndicator size="small" color="#333" />
+                        ) : (
+                            <Ionicon name="download-outline" size={28} color="#333" />
+                        )}
+                    </TouchableOpacity>
                 </View>
 
-                <TouchableOpacity onPress={this.handleSavePhoto}>
-                    <Ionicon name="download-outline" size={28} color="#333" />
-                </TouchableOpacity>
-
-                {/* Envolvemos el botón en un Animated.View para poder animarlo */}
+                {/* Lado Derecho: Botón de Guardar en Lista */}
                 <Animated.View style={animatedSaveButtonStyle}>
                     <TouchableOpacity
                         onPress={this.openSaveToListScreen}
@@ -353,10 +368,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     likesText: {
-        marginLeft: 8,
         fontSize: 16,
         fontWeight: '600',
         color: '#333',
+        marginRight: 20, // Espacio después del número de likes
+    },
+    leftActions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    actionButton: {
+        marginRight: 15, // Espacio entre los botones de la izquierda
     },
     saveButton: {
         backgroundColor: '#007AFF', // Azul primario

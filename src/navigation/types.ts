@@ -50,6 +50,12 @@ export type ListsScreenProps = CompositeScreenProps<
     MaterialTopTabScreenProps<ProfileTabParamList, 'Lists'>,
     NativeStackScreenProps<RootStackParamList>
 >;
+
+export type ActivityScreenProps = CompositeScreenProps<
+    BottomTabScreenProps<TabParamList, 'ActivityTab'>,
+    NativeStackScreenProps<RootStackParamList>
+>;
+
 export type FavoritesScreenProps = CompositeScreenProps<
     MaterialTopTabScreenProps<ProfileTabParamList, 'Favorites'>,
     NativeStackScreenProps<RootStackParamList>
@@ -64,3 +70,4 @@ export type PlaceholderScreenProps = CompositeScreenProps<
     BottomTabScreenProps<TabParamList>,
     NativeStackScreenProps<RootStackParamList>
 >;
+
