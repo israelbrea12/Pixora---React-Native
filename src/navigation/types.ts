@@ -13,6 +13,7 @@ export type RootStackParamList = {
     photoDetails: { photo: Photo };
     SaveToList: { photo: Photo };
     PhotoListDetail: { listId: number; listName: string };
+    AddPhoto: { imageUri: string };
 };
 
 // Define las pestañas del navegador inferior
@@ -71,3 +72,9 @@ export type PlaceholderScreenProps = CompositeScreenProps<
     NativeStackScreenProps<RootStackParamList>
 >;
 
+export type AddPhotoScreenProps = NativeStackScreenProps<RootStackParamList, 'AddPhoto'>;
+
+export type MyPhotosScreenProps = CompositeScreenProps<
+    MaterialTopTabScreenProps<ProfileTabParamList, 'MyPhotos'>,
+    NativeStackScreenProps<RootStackParamList>
+>;

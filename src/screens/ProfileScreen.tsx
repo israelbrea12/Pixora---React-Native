@@ -8,6 +8,7 @@ import Ionicon from 'react-native-vector-icons/Ionicons';
 import PlaceholderScreen from './PlaceholderScreen';
 import FavoritesScreen from './FavoritesScreen';
 import ListsScreen from './ListsScreen';
+import MyPhotosScreen from './MyPhotosScreen';
 import { LayoutContext } from '../context/LayoutContext';
 import { LayoutMode, Language } from '../services/PreferencesManager';
 import {
@@ -38,7 +39,10 @@ const ProfileTabNavigator = () => (
             tabBarIndicatorStyle: { backgroundColor: '#000' },
         }}
     >
-        <TopTab.Screen name="MyPhotos" component={PlaceholderScreen} options={{ title: i18n.t('myPhotos') }} initialParams={{ title: i18n.t('myPhotos') }} />
+        <TopTab.Screen
+            name="MyPhotos"
+            component={MyPhotosScreen}
+            options={{ title: i18n.t('myPhotos') }} />
         <TopTab.Screen
             name="Lists"
             component={ListsScreen}

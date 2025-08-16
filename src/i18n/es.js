@@ -71,4 +71,19 @@ export default {
     activityLiked: 'Has dado me gusta a una foto',
     activityAddedToList: 'Has añadido una foto a la lista "%{listName}"',
     noActivityYet: 'No hay actividad todavía',
+
+    // MyPhotos logic
+    myPhotos: "Mis Fotos",
+    addPhoto: "Añadir Foto",
+    fromGallery: "Desde la galería",
+    fromCamera: "Desde la cámara",
+    newPhoto: "Nueva Foto",
+    username: "Nombre de usuario",
+    description: "Descripción",
+    enterUsername: "Introduce tu nombre de usuario",
+    enterDescription: "Añade una descripción...",
+    uploadPhoto: "Subir Foto",
+    fillAllFields: "Por favor, rellena todos los campos.",
+    photoUploaded: "¡Foto subida con éxito!",
+    photoUploadError: "No se pudo subir la foto."
 };

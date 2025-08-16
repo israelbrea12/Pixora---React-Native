@@ -71,4 +71,19 @@ export default {
     activityAddedToList: 'You have added a photo to the list "%{listName}"',
     noActivityYet: 'There is no activity yet',
 
+    // MyPhotos logic
+    myPhotos: "My Photos",
+    addPhoto: "Add Photo",
+    fromGallery: "From Gallery",
+    fromCamera: "From Camera",
+    newPhoto: "New Photo",
+    username: "Username",
+    description: "Description",
+    enterUsername: "Enter your username",
+    enterDescription: "Add a description...",
+    uploadPhoto: "Upload Photo",
+    fillAllFields: "Please fill in all fields.",
+    photoUploaded: "Photo uploaded successfully!",
+    photoUploadError: "Could not upload photo."
+
 };

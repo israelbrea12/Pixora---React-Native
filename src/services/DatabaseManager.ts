@@ -13,6 +13,7 @@ export type PhotoListInfo = {
 // --- NUEVOS TIPOS: Para la actividad del usuario ---
 export type UserActivityType = 'LIKE' | 'ADD_TO_LIST';
 
+
 export interface UserActivity {
     id: number;
     type: UserActivityType;
@@ -51,6 +52,11 @@ export const initDB = (): void => {
                 photoData TEXT NOT NULL,
                 listName TEXT
             )`,
+            []
+        );
+
+        txn.executeSql(
+            `CREATE TABLE IF NOT EXISTS UserPhotos (id TEXT PRIMARY KEY NOT NULL, photoData TEXT NOT NULL)`,
             []
         );
     });
@@ -214,6 +220,39 @@ export const getActivities = (): Promise<UserActivity[]> => {
                 },
                 (_, err) => { reject(err); return false; }
             );
+        });
+    });
+};
+
+// --- NUEVAS FUNCIONES PARA FOTOS DEL USUARIO ---
+
+/**
+ * Añade una foto subida por el usuario a la base de datos local.
+ */
+export const addUserPhoto = (photo: Photo): Promise<void> => {
+    return new Promise((resolve, reject) => {
+        db.transaction(txn => {
+            txn.executeSql('INSERT INTO UserPhotos (id, photoData) VALUES (?, ?)',
+                [photo.id, JSON.stringify(photo)],
+                () => resolve(),
+                (_, error) => { reject(error); return false; });
+        });
+    });
+};
+
+/**
+ * Obtiene todas las fotos subidas por el usuario.
+ */
+export const getUserPhotos = (): Promise<Photo[]> => {
+    return new Promise((resolve, reject) => {
+        db.transaction(txn => {
+            txn.executeSql('SELECT photoData FROM UserPhotos', [], (_, { rows }) => {
+                const userPhotos: Photo[] = [];
+                for (let i = 0; i < rows.length; i++) {
+                    userPhotos.push(JSON.parse(rows.item(i).photoData));
+                }
+                resolve(userPhotos);
+            }, (_, error) => { reject(error); return false; });
         });
     });
 };

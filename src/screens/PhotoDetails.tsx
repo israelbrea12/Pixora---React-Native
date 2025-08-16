@@ -51,15 +51,20 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
     }
 
     public componentDidMount() {
-        this.apiClient
-            .getPhotoDetails(this.photoID)
-            .then(fullPhotoDetails => {
-                this.setState({ photo: fullPhotoDetails, isLoading: false });
-            })
-            .catch(error => {
-                console.error(error);
-                this.setState({ isLoading: false });
-            });
+        if (this.photoID.startsWith('user_')) {
+            this.setState({ isLoading: false });
+        } else {
+            // Si es una foto de Unsplash, sí buscamos los detalles.
+            this.apiClient
+                .getPhotoDetails(this.photoID)
+                .then(fullPhotoDetails => {
+                    this.setState({ photo: fullPhotoDetails, isLoading: false });
+                })
+                .catch(error => {
+                    console.error(error);
+                    this.setState({ isLoading: false });
+                });
+        }
         isFavorite(this.photoID).then(isFav => {
             this.setState({ isFavorite: isFav });
         });
