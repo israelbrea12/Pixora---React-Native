@@ -84,6 +84,19 @@ export default {
     uploadPhoto: "Upload Photo",
     fillAllFields: "Please fill in all fields.",
     photoUploaded: "Photo uploaded successfully!",
-    photoUploadError: "Could not upload photo."
+    photoUploadError: "Could not upload photo.",
+
+    // PERMISOS
+    cameraPermissionTitle: "Camera Permit",
+    cameraPermissionMessage: "Pixora needs access to your camera so you can take photos.",
+    galleryPermissionTitle: "Gallery Permission",
+    galleryPermissionMessage: "Pixora needs access to your gallery so you can select photos.",
+    askMeLater: "Ask Me Later",
+    permissionDenied: "Permission denied",
+    cameraPermissionDeniedMessage: "You cannot use the camera without granting permission.",
+    galleryPermissionDeniedMessage: "You cannot select photos without granting permission.",
+    openSettings: "Open Settings",
+    cameraPermissionPermanentlyDeniedMessage: "You have permanently denied camera permission. Please enable it in the app settings.",
+    galleryPermissionPermanentlyDeniedMessage: "You have permanently denied gallery permission. Please enable it from the app settings."
 
 };

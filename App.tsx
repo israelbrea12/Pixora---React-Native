@@ -1,7 +1,7 @@
 // App.tsx
 
 import React, { Component, useState } from 'react';
-import { View, Alert } from 'react-native';
+import { View, Alert, Platform, PermissionsAndroid, Linking } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -42,11 +42,81 @@ const MainTabs = () => {
   const [isSheetVisible, setSheetVisible] = useState(false);
   const navigation = useNavigation<any>(); // Usamos 'any' para simplificar, se podría tipar mejor
 
-  const handleLaunchGallery = () => {
-    setSheetVisible(false); // Cerramos el sheet
+  const requestCameraPermission = async (): Promise<boolean> => {
+    if (Platform.OS === 'android') {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.CAMERA,
+          {
+            title: i18n.t('cameraPermissionTitle'),
+            message: i18n.t('cameraPermissionMessage'),
+            buttonNeutral: i18n.t('askMeLater'),
+            buttonNegative: i18n.t('cancel'),
+            buttonPositive: i18n.t('accept'),
+          },
+        );
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      } catch (err) {
+        console.warn(err);
+        return false;
+      }
+    } else {
+      // En iOS, la librería gestiona el permiso la primera vez.
+      // Si falla, es porque el usuario ya lo ha denegado.
+      return true;
+    }
+  };
+
+  // --- NUEVA FUNCIÓN AUXILIAR PARA PERMISOS DE GALERÍA (Android) ---
+  const requestGalleryPermission = async (): Promise<boolean> => {
+    if (Platform.OS === 'android') {
+      try {
+        // Para Android 13+ se usa READ_MEDIA_IMAGES
+        const permission = Platform.Version >= 33
+          ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
+          : PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
+
+        const granted = await PermissionsAndroid.request(permission, {
+          title: i18n.t('galleryPermissionTitle'),
+          message: i18n.t('galleryPermissionMessage'),
+          buttonPositive: i18n.t('accept'),
+          buttonNegative: i18n.t('cancel'),
+        });
+        return granted === PermissionsAndroid.RESULTS.GRANTED;
+      } catch (err) {
+        console.warn(err);
+        return false;
+      }
+    } else {
+      return true;
+    }
+  };
+
+  // --- MODIFICACIÓN: Hacemos la función async ---
+  const handleLaunchGallery = async () => {
+    setSheetVisible(false);
+
+    // 1. Solicitamos permiso ANTES de abrir la galería
+    const hasPermission = await requestGalleryPermission();
+    if (!hasPermission) {
+      Alert.alert(i18n.t('permissionDenied'), i18n.t('galleryPermissionDeniedMessage'));
+      return;
+    }
+
+    // 2. Si tenemos permiso, abrimos la galería
     launchImageLibrary({ mediaType: 'photo' }, (response) => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
+      } else if (response.errorCode === 'permission') {
+        // El usuario ha denegado el permiso permanentemente
+        Alert.alert(
+          i18n.t('permissionDenied'),
+          i18n.t('galleryPermissionPermanentlyDeniedMessage'),
+          [
+            { text: i18n.t('cancel'), style: 'cancel' },
+            { text: i18n.t('openSettings'), onPress: () => Linking.openSettings() },
+          ],
+        );
       } else if (response.errorCode) {
         console.log('ImagePicker Error: ', response.errorMessage);
         Alert.alert('Error', 'No se pudo seleccionar la imagen.');
@@ -56,11 +126,31 @@ const MainTabs = () => {
     });
   };
 
-  const handleLaunchCamera = () => {
+  // --- MODIFICACIÓN: Hacemos la función async ---
+  const handleLaunchCamera = async () => {
     setSheetVisible(false);
+
+    // 1. Solicitamos permiso ANTES de abrir la cámara
+    const hasPermission = await requestCameraPermission();
+    if (!hasPermission) {
+      Alert.alert(i18n.t('permissionDenied'), i18n.t('cameraPermissionDeniedMessage'));
+      return;
+    }
+
+    // 2. Si tenemos permiso, abrimos la cámara
     launchCamera({ mediaType: 'photo', saveToPhotos: true }, (response) => {
       if (response.didCancel) {
         console.log('User cancelled camera');
+      } else if (response.errorCode === 'permission') {
+        // El usuario ha denegado el permiso permanentemente
+        Alert.alert(
+          i18n.t('permissionDenied'),
+          i18n.t('cameraPermissionPermanentlyDeniedMessage'),
+          [
+            { text: i18n.t('cancel'), style: 'cancel' },
+            { text: i18n.t('openSettings'), onPress: () => Linking.openSettings() },
+          ],
+        );
       } else if (response.errorCode) {
         console.log('Camera Error: ', response.errorMessage);
         Alert.alert('Error', 'No se pudo usar la cámara.');

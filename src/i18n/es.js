@@ -85,5 +85,19 @@ export default {
     uploadPhoto: "Subir Foto",
     fillAllFields: "Por favor, rellena todos los campos.",
     photoUploaded: "¡Foto subida con éxito!",
-    photoUploadError: "No se pudo subir la foto."
+    photoUploadError: "No se pudo subir la foto.",
+
+    // PERMISOS
+    cameraPermissionTitle: "Permiso de Cámara",
+    cameraPermissionMessage: "Pixora necesita acceso a tu cámara para que puedas tomar fotos.",
+    galleryPermissionTitle: "Permiso de Galería",
+    galleryPermissionMessage: "Pixora necesita acceso a tu galería para que puedas seleccionar fotos.",
+    askMeLater: "Pregúntame Después",
+    permissionDenied: "Permiso Denegado",
+    cameraPermissionDeniedMessage: "No puedes usar la cámara sin conceder el permiso.",
+    galleryPermissionDeniedMessage: "No puedes seleccionar fotos sin conceder el permiso.",
+    openSettings: "Abrir Ajustes",
+    cameraPermissionPermanentlyDeniedMessage: "Has denegado el permiso de cámara permanentemente. Por favor, actívalo desde los ajustes de la aplicación.",
+    galleryPermissionPermanentlyDeniedMessage: "Has denegado el permiso de galería permanentemente. Por favor, actívalo desde los ajustes de la aplicación."
+
 };
