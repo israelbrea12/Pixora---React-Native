@@ -1238,6 +1238,27 @@ PODS:
     - React-jsiexecutor
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
+  - react-native-image-picker (8.2.1):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - react-native-pager-view (6.9.1):
     - DoubleConversion
     - glog
@@ -1259,7 +1280,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-safe-area-context (5.6.0):
+  - react-native-safe-area-context (5.5.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1272,8 +1293,8 @@ PODS:
     - React-featureflags
     - React-graphics
     - React-ImageManager
-    - react-native-safe-area-context/common (= 5.6.0)
-    - react-native-safe-area-context/fabric (= 5.6.0)
+    - react-native-safe-area-context/common (= 5.5.2)
+    - react-native-safe-area-context/fabric (= 5.5.2)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-rendererdebug
@@ -1282,7 +1303,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-safe-area-context/common (5.6.0):
+  - react-native-safe-area-context/common (5.5.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1303,7 +1324,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-safe-area-context/fabric (5.6.0):
+  - react-native-safe-area-context/fabric (5.5.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1677,7 +1698,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNScreens (4.14.1):
+  - RNScreens (4.13.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1698,9 +1719,9 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNScreens/common (= 4.14.1)
+    - RNScreens/common (= 4.13.1)
     - Yoga
-  - RNScreens/common (4.14.1):
+  - RNScreens/common (4.13.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1786,6 +1807,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
+  - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-sqlite-2 (from `../node_modules/react-native-sqlite-2`)
@@ -1904,6 +1926,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
+  react-native-image-picker:
+    :path: "../node_modules/react-native-image-picker"
   react-native-pager-view:
     :path: "../node_modules/react-native-pager-view"
   react-native-safe-area-context:
@@ -2017,8 +2041,9 @@ SPEC CHECKSUMS:
   React-logger: e6c3c1b55c18cc1b945b647ff9ada53e0e710b50
   React-Mapbuffer: 396d97d3534fa0df8c1a690eb6269d8a7d9f5b0e
   React-microtasksnativemodule: 9f9819152d22361967a6dfaaca7828af37b0ae70
+  react-native-image-picker: fb2d12cb86e0b3e58caee9aa660ddbd5742c841c
   react-native-pager-view: 5bab97f356bdaba4ed3b08cf3fa6e927c0746b2b
-  react-native-safe-area-context: 673dffed28e5ed410e0ed789b22eea27dacf3fca
+  react-native-safe-area-context: 63e27bb3aeb2c0ef652f8913d731573932080ff9
   react-native-sqlite-2: 21c4a9d439e92193a8712c68492731c014671b53
   React-NativeModulesApple: 7c9c0c4e76731529b2e15f5d5edb266b980556ea
   React-perflogger: 069d41f741187be92ed46c6ac67add03b99f3166
@@ -2051,7 +2076,7 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: efa02b644121f4e1f7f33e712f4f82c30aa4ff4a
   RNGestureHandler: ab7287c9593b75911be221b6c97d7ae6e02652e6
   RNLocalize: 4d9d99084f4171fa3f538dc5ef0d3bd07d91c0be
-  RNScreens: c1e2cca8944acfe3aa40d2c1cba55e96891d4ba0
+  RNScreens: 6edb124b97753c3978b2a7c8974672c0f31bc78a
   RNVectorIcons: 3a2173c340d645b9af2dfe39801ae470a1b0a9a7
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: eca8dd841b7cd47d82d66be58af8e3aeb819012f
