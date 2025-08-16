@@ -10,6 +10,7 @@ import { MenuProvider } from 'react-native-popup-menu';
 import { initDB } from './src/services/DatabaseManager';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 import { RootStackParamList, TabParamList } from './src/navigation/types';
 // Update the import path below if the actual file name or folder structure is different (e.g., 'localizationManager' or 'localization-manager')
@@ -60,10 +61,23 @@ const MainTabs = () => {
         console.warn(err);
         return false;
       }
-    } else {
-      // En iOS, la librería gestiona el permiso la primera vez.
-      // Si falla, es porque el usuario ya lo ha denegado.
-      return true;
+    } else { // --- LÓGICA PARA iOS ---
+      const result = await request(PERMISSIONS.IOS.CAMERA);
+      if (result === RESULTS.GRANTED) {
+        return true; // El usuario aceptó el permiso
+      }
+      if (result === RESULTS.BLOCKED) {
+        // El usuario denegó permanentemente. Tu lógica actual con `Linking.openSettings()` funcionará aquí.
+        Alert.alert(
+          i18n.t('permissionDenied'),
+          i18n.t('cameraPermissionPermanentlyDeniedMessage'),
+          [
+            { text: i18n.t('cancel'), style: 'cancel' },
+            { text: i18n.t('openSettings'), onPress: () => Linking.openSettings() },
+          ],
+        );
+      }
+      return false; // El usuario denegó esta vez (puede volver a preguntar)
     }
   };
 
