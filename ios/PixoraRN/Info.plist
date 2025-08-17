@@ -4,8 +4,12 @@
 <dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Necesitamos acceso a tu cámara para que puedas tomar y subir fotos.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Necesitamos acceso a tu micrófono para poder grabar vídeos con audio.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Necesitamos acceso a tu galería para que puedas seleccionar y subir fotos.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Necesitamos acceso a tu cámara para que puedas seleccionar y subir fotos.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

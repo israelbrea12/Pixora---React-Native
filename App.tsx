@@ -10,7 +10,7 @@ import { MenuProvider } from 'react-native-popup-menu';
 import { initDB } from './src/services/DatabaseManager';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 
 import { RootStackParamList, TabParamList } from './src/navigation/types';
 // Update the import path below if the actual file name or folder structure is different (e.g., 'localizationManager' or 'localization-manager')
@@ -43,135 +43,94 @@ const MainTabs = () => {
   const [isSheetVisible, setSheetVisible] = useState(false);
   const navigation = useNavigation<any>(); // Usamos 'any' para simplificar, se podría tipar mejor
 
-  const requestCameraPermission = async (): Promise<boolean> => {
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.CAMERA,
-          {
-            title: i18n.t('cameraPermissionTitle'),
-            message: i18n.t('cameraPermissionMessage'),
-            buttonNeutral: i18n.t('askMeLater'),
-            buttonNegative: i18n.t('cancel'),
-            buttonPositive: i18n.t('accept'),
-          },
-        );
-        return granted === PermissionsAndroid.RESULTS.GRANTED;
-      } catch (err) {
-        console.warn(err);
-        return false;
+  const requestPermission = async (permission: any): Promise<boolean> => {
+    try {
+      // Primero, comprobamos el estado actual del permiso
+      const result = await check(permission);
+      console.log('Permission status:', result);
+
+      switch (result) {
+        case RESULTS.GRANTED:
+          return true; // Ya tenemos permiso, todo bien
+
+        case RESULTS.LIMITED:
+          return true; // El usuario ha dado acceso limitado a la galería, suficiente para elegir
+
+        case RESULTS.DENIED:
+          // El permiso no se ha pedido o se denegó una vez. Lo pedimos.
+          const requestResult = await request(permission);
+          return requestResult === RESULTS.GRANTED;
+
+        case RESULTS.BLOCKED:
+          // El permiso está denegado permanentemente. Hay que guiar al usuario a los ajustes.
+          Alert.alert(
+            i18n.t('permissionDenied'),
+            i18n.t('cameraPermissionPermanentlyDeniedMessage'), // Puedes crear un mensaje más genérico
+            [
+              { text: i18n.t('cancel'), style: 'cancel' },
+              { text: i18n.t('openSettings'), onPress: () => Linking.openSettings() },
+            ],
+          );
+          return false;
+
+        case RESULTS.UNAVAILABLE:
+          // El hardware no está disponible (ej. no hay cámara)
+          Alert.alert('Error', 'Esta función no está disponible en tu dispositivo.');
+          return false;
       }
-    } else { // --- LÓGICA PARA iOS ---
-      const result = await request(PERMISSIONS.IOS.CAMERA);
-      if (result === RESULTS.GRANTED) {
-        return true; // El usuario aceptó el permiso
-      }
-      if (result === RESULTS.BLOCKED) {
-        // El usuario denegó permanentemente. Tu lógica actual con `Linking.openSettings()` funcionará aquí.
-        Alert.alert(
-          i18n.t('permissionDenied'),
-          i18n.t('cameraPermissionPermanentlyDeniedMessage'),
-          [
-            { text: i18n.t('cancel'), style: 'cancel' },
-            { text: i18n.t('openSettings'), onPress: () => Linking.openSettings() },
-          ],
-        );
-      }
-      return false; // El usuario denegó esta vez (puede volver a preguntar)
+    } catch (error) {
+      console.error("Error requesting permission", error);
+      return false;
     }
+    return false;
   };
 
-  // --- NUEVA FUNCIÓN AUXILIAR PARA PERMISOS DE GALERÍA (Android) ---
-  const requestGalleryPermission = async (): Promise<boolean> => {
-    if (Platform.OS === 'android') {
-      try {
-        // Para Android 13+ se usa READ_MEDIA_IMAGES
-        const permission = Platform.Version >= 33
-          ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
-          : PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE;
-
-        const granted = await PermissionsAndroid.request(permission, {
-          title: i18n.t('galleryPermissionTitle'),
-          message: i18n.t('galleryPermissionMessage'),
-          buttonPositive: i18n.t('accept'),
-          buttonNegative: i18n.t('cancel'),
-        });
-        return granted === PermissionsAndroid.RESULTS.GRANTED;
-      } catch (err) {
-        console.warn(err);
-        return false;
-      }
-    } else {
-      return true;
-    }
-  };
-
-  // --- MODIFICACIÓN: Hacemos la función async ---
+  // --- 2. ACTUALIZAMOS EL MANEJADOR DE LA GALERÍA ---
   const handleLaunchGallery = async () => {
     setSheetVisible(false);
 
-    // 1. Solicitamos permiso ANTES de abrir la galería
-    const hasPermission = await requestGalleryPermission();
+    // Definimos el permiso necesario según la plataforma
+    const permission = Platform.OS === 'ios'
+      ? PERMISSIONS.IOS.PHOTO_LIBRARY
+      : (Number(Platform.Version) >= 33 ? PERMISSIONS.ANDROID.READ_MEDIA_IMAGES : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE);
+
+    // Pedimos permiso ANTES de hacer nada
+    const hasPermission = await requestPermission(permission);
     if (!hasPermission) {
-      Alert.alert(i18n.t('permissionDenied'), i18n.t('galleryPermissionDeniedMessage'));
-      return;
+      console.log('Gallery permission denied');
+      return; // Si no hay permiso, no continuamos
     }
 
-    // 2. Si tenemos permiso, abrimos la galería
-    launchImageLibrary({ mediaType: 'photo' }, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.errorCode === 'permission') {
-        // El usuario ha denegado el permiso permanentemente
-        Alert.alert(
-          i18n.t('permissionDenied'),
-          i18n.t('galleryPermissionPermanentlyDeniedMessage'),
-          [
-            { text: i18n.t('cancel'), style: 'cancel' },
-            { text: i18n.t('openSettings'), onPress: () => Linking.openSettings() },
-          ],
-        );
-      } else if (response.errorCode) {
-        console.log('ImagePicker Error: ', response.errorMessage);
-        Alert.alert('Error', 'No se pudo seleccionar la imagen.');
-      } else if (response.assets && response.assets[0].uri) {
-        navigation.navigate('AddPhoto', { imageUri: response.assets[0].uri });
-      }
-    });
+    // Si tenemos permiso, lanzamos la galería
+    const result = await launchImageLibrary({ mediaType: 'photo', quality: 1 });
+
+    if (!result.didCancel && result.assets && result.assets[0].uri) {
+      navigation.navigate('AddPhoto', { imageUri: result.assets[0].uri });
+    }
   };
 
-  // --- MODIFICACIÓN: Hacemos la función async ---
+  // --- 3. ACTUALIZAMOS EL MANEJADOR DE LA CÁMARA ---
   const handleLaunchCamera = async () => {
     setSheetVisible(false);
 
-    // 1. Solicitamos permiso ANTES de abrir la cámara
-    const hasPermission = await requestCameraPermission();
+    // Definimos el permiso necesario
+    const permission = Platform.OS === 'ios'
+      ? PERMISSIONS.IOS.CAMERA
+      : PERMISSIONS.ANDROID.CAMERA;
+
+    // Pedimos permiso ANTES
+    const hasPermission = await requestPermission(permission);
     if (!hasPermission) {
-      Alert.alert(i18n.t('permissionDenied'), i18n.t('cameraPermissionDeniedMessage'));
-      return;
+      console.log('Camera permission denied');
+      return; // No continuamos
     }
 
-    // 2. Si tenemos permiso, abrimos la cámara
-    launchCamera({ mediaType: 'photo', saveToPhotos: true }, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled camera');
-      } else if (response.errorCode === 'permission') {
-        // El usuario ha denegado el permiso permanentemente
-        Alert.alert(
-          i18n.t('permissionDenied'),
-          i18n.t('cameraPermissionPermanentlyDeniedMessage'),
-          [
-            { text: i18n.t('cancel'), style: 'cancel' },
-            { text: i18n.t('openSettings'), onPress: () => Linking.openSettings() },
-          ],
-        );
-      } else if (response.errorCode) {
-        console.log('Camera Error: ', response.errorMessage);
-        Alert.alert('Error', 'No se pudo usar la cámara.');
-      } else if (response.assets && response.assets[0].uri) {
-        navigation.navigate('AddPhoto', { imageUri: response.assets[0].uri });
-      }
-    });
+    // Si tenemos permiso, lanzamos la cámara
+    const result = await launchCamera({ mediaType: 'photo', saveToPhotos: true, quality: 1 });
+
+    if (!result.didCancel && result.assets && result.assets[0].uri) {
+      navigation.navigate('AddPhoto', { imageUri: result.assets[0].uri });
+    }
   };
 
   return (
