@@ -110,27 +110,44 @@ const MainTabs = () => {
   };
 
   // --- 3. ACTUALIZAMOS EL MANEJADOR DE LA CÁMARA ---
+  // --- 3. ACTUALIZAMOS EL MANEJADOR DE LA CÁMARA (CON TIMEOUT) ---
+  // --- 3. MANEJADOR DE CÁMARA EN MODO DEPURACIÓN ---
   const handleLaunchCamera = async () => {
     setSheetVisible(false);
 
-    // Definimos el permiso necesario
     const permission = Platform.OS === 'ios'
       ? PERMISSIONS.IOS.CAMERA
       : PERMISSIONS.ANDROID.CAMERA;
 
-    // Pedimos permiso ANTES
     const hasPermission = await requestPermission(permission);
+
     if (!hasPermission) {
       console.log('Camera permission denied');
-      return; // No continuamos
+      return;
     }
 
-    // Si tenemos permiso, lanzamos la cámara
-    const result = await launchCamera({ mediaType: 'photo', saveToPhotos: true, quality: 1 });
+    setTimeout(async () => {
+      console.log('Attempting to launch camera...'); // Log para saber que llegamos aquí
 
-    if (!result.didCancel && result.assets && result.assets[0].uri) {
-      navigation.navigate('AddPhoto', { imageUri: result.assets[0].uri });
-    }
+      const result = await launchCamera({
+        mediaType: 'photo',
+        saveToPhotos: true,
+        quality: 1,
+      });
+
+      // 👇 --- ESTA ES LA LÍNEA MÁS IMPORTANTE --- 👇
+      // Imprimimos el objeto de resultado completo para ver qué contiene
+      console.log('launchCamera result:', JSON.stringify(result, null, 2));
+
+      if (result.errorCode) {
+        Alert.alert(
+          `Error: ${result.errorCode}`,
+          result.errorMessage || 'Ocurrió un error al abrir la cámara.'
+        );
+      } else if (!result.didCancel && result.assets && result.assets[0].uri) {
+        navigation.navigate('AddPhoto', { imageUri: result.assets[0].uri });
+      }
+    }, 200);
   };
 
   return (
