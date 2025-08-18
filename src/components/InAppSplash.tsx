@@ -16,7 +16,7 @@ export default function InAppSplash({ onFinished }: Props) {
         BootSplash.hide({ fade: true });
 
         // Duración total que la splash estará visible
-        const TOTAL_SPLASH_DURATION = 3500; // 3.5 segundos
+        const TOTAL_SPLASH_DURATION = 2000; // 3.5 segundos
 
         const hideTimer = setTimeout(() => {
             // Inicia la animación de desvanecimiento
