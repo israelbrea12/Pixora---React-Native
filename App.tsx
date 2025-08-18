@@ -1,7 +1,5 @@
-// App.tsx
-
 import React, { Component, useState } from 'react';
-import { View, Alert, Platform, PermissionsAndroid, Linking } from 'react-native';
+import { View, Alert, Platform, Linking } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -11,11 +9,11 @@ import { initDB } from './src/services/DatabaseManager';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import InAppSplash from './src/components/InAppSplash';
 
 import { RootStackParamList, TabParamList } from './src/navigation/types';
-// Update the import path below if the actual file name or folder structure is different (e.g., 'localizationManager' or 'localization-manager')
 import { initLocalization, onLanguageChange } from './src/i18n/LocalizationManager';
-import i18n from './src/i18n/LocalizationManager'; // Asegúrate de que la ruta sea correcta
+import i18n from './src/i18n/LocalizationManager';
 
 import HomeScreen from './src/screens/HomeScreen';
 import SearchPhotosList from './src/screens/SearchPhotosList';
@@ -25,56 +23,38 @@ import ProfileScreen from './src/screens/ProfileScreen';
 import SaveToListScreen from './src/screens/SaveToListScreen';
 import PhotoListDetailScreen from './src/screens/PhotoListDetailScreen';
 import ActivityScreen from './src/screens/ActivityScreen';
-import AddPhotoScreen from './src/screens/AddPhotoScreen'; // --- NUEVO IMPORT ---
+import AddPhotoScreen from './src/screens/AddPhotoScreen';
 import AddPhotoBottomSheet from './src/components/AddPhotoBottomSheet';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 
-interface AppState {
-  isReady: boolean;
-  appKey: number; // Esta clave forzará el re-renderizado
-}
-
-/**
- * Componente que define el navegador de pestañas inferior
- */
+// El componente MainTabs no necesita cambios
 const MainTabs = () => {
+  // ... (tu código de MainTabs aquí, sin cambios)
   const [isSheetVisible, setSheetVisible] = useState(false);
-  const navigation = useNavigation<any>(); // Usamos 'any' para simplificar, se podría tipar mejor
+  const navigation = useNavigation<any>();
 
   const requestPermission = async (permission: any): Promise<boolean> => {
     try {
-      // Primero, comprobamos el estado actual del permiso
       const result = await check(permission);
-      console.log('Permission status:', result);
-
       switch (result) {
-        case RESULTS.GRANTED:
-          return true; // Ya tenemos permiso, todo bien
-
-        case RESULTS.LIMITED:
-          return true; // El usuario ha dado acceso limitado a la galería, suficiente para elegir
-
+        case RESULTS.GRANTED: return true;
+        case RESULTS.LIMITED: return true;
         case RESULTS.DENIED:
-          // El permiso no se ha pedido o se denegó una vez. Lo pedimos.
           const requestResult = await request(permission);
           return requestResult === RESULTS.GRANTED;
-
         case RESULTS.BLOCKED:
-          // El permiso está denegado permanentemente. Hay que guiar al usuario a los ajustes.
           Alert.alert(
             i18n.t('permissionDenied'),
-            i18n.t('cameraPermissionPermanentlyDeniedMessage'), // Puedes crear un mensaje más genérico
+            i18n.t('cameraPermissionPermanentlyDeniedMessage'),
             [
               { text: i18n.t('cancel'), style: 'cancel' },
               { text: i18n.t('openSettings'), onPress: () => Linking.openSettings() },
             ],
           );
           return false;
-
         case RESULTS.UNAVAILABLE:
-          // El hardware no está disponible (ej. no hay cámara)
           Alert.alert('Error', 'Esta función no está disponible en tu dispositivo.');
           return false;
       }
@@ -85,65 +65,28 @@ const MainTabs = () => {
     return false;
   };
 
-  // --- 2. ACTUALIZAMOS EL MANEJADOR DE LA GALERÍA ---
   const handleLaunchGallery = async () => {
     setSheetVisible(false);
-
-    // Definimos el permiso necesario según la plataforma
     const permission = Platform.OS === 'ios'
       ? PERMISSIONS.IOS.PHOTO_LIBRARY
       : (Number(Platform.Version) >= 33 ? PERMISSIONS.ANDROID.READ_MEDIA_IMAGES : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE);
-
-    // Pedimos permiso ANTES de hacer nada
     const hasPermission = await requestPermission(permission);
-    if (!hasPermission) {
-      console.log('Gallery permission denied');
-      return; // Si no hay permiso, no continuamos
-    }
-
-    // Si tenemos permiso, lanzamos la galería
+    if (!hasPermission) return;
     const result = await launchImageLibrary({ mediaType: 'photo', quality: 1 });
-
     if (!result.didCancel && result.assets && result.assets[0].uri) {
       navigation.navigate('AddPhoto', { imageUri: result.assets[0].uri });
     }
   };
 
-  // --- 3. ACTUALIZAMOS EL MANEJADOR DE LA CÁMARA ---
-  // --- 3. ACTUALIZAMOS EL MANEJADOR DE LA CÁMARA (CON TIMEOUT) ---
-  // --- 3. MANEJADOR DE CÁMARA EN MODO DEPURACIÓN ---
   const handleLaunchCamera = async () => {
     setSheetVisible(false);
-
-    const permission = Platform.OS === 'ios'
-      ? PERMISSIONS.IOS.CAMERA
-      : PERMISSIONS.ANDROID.CAMERA;
-
+    const permission = Platform.OS === 'ios' ? PERMISSIONS.IOS.CAMERA : PERMISSIONS.ANDROID.CAMERA;
     const hasPermission = await requestPermission(permission);
-
-    if (!hasPermission) {
-      console.log('Camera permission denied');
-      return;
-    }
-
+    if (!hasPermission) return;
     setTimeout(async () => {
-      console.log('Attempting to launch camera...'); // Log para saber que llegamos aquí
-
-      const result = await launchCamera({
-        mediaType: 'photo',
-        saveToPhotos: true,
-        quality: 1,
-      });
-
-      // 👇 --- ESTA ES LA LÍNEA MÁS IMPORTANTE --- 👇
-      // Imprimimos el objeto de resultado completo para ver qué contiene
-      console.log('launchCamera result:', JSON.stringify(result, null, 2));
-
+      const result = await launchCamera({ mediaType: 'photo', saveToPhotos: true, quality: 1 });
       if (result.errorCode) {
-        Alert.alert(
-          `Error: ${result.errorCode}`,
-          result.errorMessage || 'Ocurrió un error al abrir la cámara.'
-        );
+        Alert.alert(`Error: ${result.errorCode}`, result.errorMessage || 'Ocurrió un error.');
       } else if (!result.didCancel && result.assets && result.assets[0].uri) {
         navigation.navigate('AddPhoto', { imageUri: result.assets[0].uri });
       }
@@ -157,14 +100,9 @@ const MainTabs = () => {
         <Tab.Screen name="SearchTab" component={SearchPhotosList} options={{ title: i18n.t('search'), tabBarIcon: ({ color, size }) => <Ionicon name="search" size={size} color={color} /> }} />
         <Tab.Screen
           name="AddTab"
-          component={PlaceholderScreen} // Componente de relleno, nunca se mostrará
+          component={PlaceholderScreen}
           options={{ title: i18n.t('add'), tabBarIcon: ({ color, size }) => <Ionicon name="add-circle" size={size} color={color} /> }}
-          listeners={{
-            tabPress: e => {
-              e.preventDefault(); // Prevenimos la navegación
-              setSheetVisible(true); // Abrimos nuestro BottomSheet
-            },
-          }}
+          listeners={{ tabPress: e => { e.preventDefault(); setSheetVisible(true); }, }}
         />
         <Tab.Screen name="ActivityTab" component={ActivityScreen} options={{ title: i18n.t('activity'), tabBarIcon: ({ color, size }) => <Ionicon name="heart" size={size} color={color} /> }} />
         <Tab.Screen name="SettingsTab" component={ProfileScreen} options={{ title: i18n.t('profile'), tabBarIcon: ({ color, size }) => <Ionicon name="person-circle" size={size} color={color} /> }} />
@@ -179,56 +117,64 @@ const MainTabs = () => {
   );
 };
 
-export default class App extends Component<{}, AppState> {
+// --- CAMBIOS EN LA CLASE APP ---
+interface AppState {
+  isDataReady: boolean;      // Para saber si los datos están listos
+  isSplashFinished: boolean; // Para saber si la animación de splash terminó
+  appKey: number;
+}
 
+export default class App extends Component<{}, AppState> {
   private unsubscribeFromLangChange?: () => void;
 
   public constructor(props: {}) {
     super(props);
     this.state = {
-      isReady: false,
-      appKey: 0, // Valor inicial
+      isDataReady: false,
+      isSplashFinished: false,
+      appKey: 0,
     };
     initDB();
-    // Inicializamos la localización
     initLocalization().then(() => {
-      this.setState({ isReady: true });
+      this.setState({ isDataReady: true });
     });
   }
 
   public componentDidMount() {
-    // --- CAMBIO 3: Nos suscribimos a los cambios de idioma ---
     this.unsubscribeFromLangChange = onLanguageChange(() => {
-      // Cuando el idioma cambia, incrementamos la clave para forzar un re-render
       this.setState(prevState => ({ appKey: prevState.appKey + 1 }));
     });
   }
 
   public componentWillUnmount() {
-    // Nos desuscribimos para evitar memory leaks
     if (this.unsubscribeFromLangChange) {
       this.unsubscribeFromLangChange();
     }
   }
 
+  // Esta función será llamada por InAppSplash cuando termine
+  private handleSplashFinish = () => {
+    this.setState({ isSplashFinished: true });
+  };
 
   public render() {
-    if (!this.state.isReady) {
-      return <View />;
+    const { isDataReady, isSplashFinished, appKey } = this.state;
+    const isAppReady = isDataReady && isSplashFinished;
+
+    // Si la app no está lista (datos Y splash), mostramos la splash
+    if (!isAppReady) {
+      return <InAppSplash onFinished={this.handleSplashFinish} />;
     }
+
+    // Cuando todo está listo, mostramos la app principal
     return (
-      <NavigationContainer key={this.state.appKey}>
+      <NavigationContainer key={appKey}>
         <LayoutProvider>
           <MenuProvider>
             <RootStack.Navigator>
-              {/* Pantalla principal que contiene todas las pestañas */}
               <RootStack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
-
-              {/* Pantallas a las que se puede navegar desde cualquier sitio */}
               <RootStack.Screen name="photoDetails" component={PhotoDetails} options={{ headerShown: false }} />
               <RootStack.Screen name="PhotoListDetail" component={PhotoListDetailScreen} />
-
-              {/* Pantallas que se presentan como un modal */}
               <RootStack.Group screenOptions={{ presentation: 'modal' }}>
                 <RootStack.Screen name="SaveToList" component={SaveToListScreen} options={{ title: i18n.t('saveTo') }} />
                 <RootStack.Screen name="AddPhoto" component={AddPhotoScreen} options={{ title: i18n.t('newPhoto') }} />
