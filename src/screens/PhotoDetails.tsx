@@ -6,6 +6,7 @@ import Ionicon from 'react-native-vector-icons/Ionicons';
 import { isPhotoSaved } from '../services/DatabaseManager';
 import { addFavorite, removeFavorite, isFavorite } from '../services/DatabaseManager';
 import i18n from '../i18n/LocalizationManager';
+import { DoubleTapImage } from '../components/DoubleTapImage';
 
 
 const AnimatedIonicon = Animated.createAnimatedComponent(Ionicon);
@@ -284,31 +285,23 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
         const imageHeight = (imageWidth * photo.height) / photo.width;
 
         return (
-            // El SafeAreaView sigue siendo el contenedor principal
             <SafeAreaView style={styles.safeArea}>
-                {/* --- CAMBIO: Añadimos un View contenedor --- */}
-                {/* Este View ocupará todo el espacio DENTRO del área segura */}
                 <View style={styles.wrapper}>
                     <ScrollView>
                         <View style={styles.container}>
-                            <Animated.Image
-                                style={[
-                                    styles.image,
-                                    {
-                                        height: imageHeight,
-                                        opacity: this.imageOpacity, // Aplicamos la opacidad animada [cite: 18]
-                                        transform: [{ scale: this.imageScale }] // Aplicamos la escala animada
-                                    }
-                                ]}
-                                source={{ uri: photo.urls.regular }}
+                            {/* --- 2. REEMPLAZA Animated.Image POR DoubleTapImage --- */}
+                            <DoubleTapImage
+                                imageUrl={photo.urls.regular}
+                                onDoubleTap={this.toggleFavorite}
+                                // Combinas los estilos en un solo objeto usando el spread operator (...)
+                                style={{ ...styles.image, height: imageHeight }}
                             />
+
                             {this.renderInteractionBar(photo)}
                             {this.renderUserInfo(photo)}
                             {this.renderDescription(photo)}
                         </View>
                     </ScrollView>
-
-                    {/* El botón ahora es hijo del View wrapper, no del SafeAreaView */}
                     <TouchableOpacity
                         onPress={() => this.props.navigation.goBack()}
                         style={styles.backButton}
