@@ -1,7 +1,7 @@
 import React from 'react';
 import { FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import PhotoCard from './PhotoCard';
-import { PhotoEntry } from '../screens/PhotoList';
+import { PhotoEntry } from './PhotoList';
 
 type LayoutType = 'list' | 'grid';
 

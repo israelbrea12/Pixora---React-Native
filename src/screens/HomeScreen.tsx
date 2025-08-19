@@ -1,6 +1,6 @@
 import React from 'react';
 import { ScrollView, Text, TouchableOpacity, StyleSheet, View } from 'react-native';
-import PhotoList, { PhotoListState } from './PhotoList';
+import PhotoList, { PhotoListState } from '../components/PhotoList';
 import { Photo } from '../api/UnsplashApiClient';
 import { HomeScreenProps } from '../navigation/types';
 import i18n from '../i18n/LocalizationManager';

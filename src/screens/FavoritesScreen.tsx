@@ -1,5 +1,5 @@
-import { PhotoListState } from './PhotoList';
-import PhotoList from './PhotoList';
+import { PhotoListState } from '../components/PhotoList';
+import PhotoList from '../components/PhotoList';
 import { getFavorites } from '../services/DatabaseManager';
 import { Photo } from '../api/UnsplashApiClient';
 import { FavoritesScreenProps } from '../navigation/types';

@@ -16,8 +16,8 @@ import { initLocalization, onLanguageChange } from './src/i18n/LocalizationManag
 import i18n from './src/i18n/LocalizationManager';
 
 import HomeScreen from './src/screens/HomeScreen';
-import SearchPhotosList from './src/screens/SearchPhotosList';
-import PhotoDetails from './src/screens/PhotoDetails';
+import SearchScreen from './src/screens/SearchScreen';
+import PhotoDetailsScreen from './src/screens/PhotoDetailsScreen';
 import PlaceholderScreen from './src/screens/PlaceholderScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import SaveToListScreen from './src/screens/SaveToListScreen';
@@ -95,7 +95,7 @@ const MainTabs = () => {
     <>
       <Tab.Navigator screenOptions={{ headerShown: false }}>
         <Tab.Screen name="HomeTab" component={HomeScreen} options={{ title: i18n.t('home'), tabBarIcon: ({ color, size }) => <Ionicon name="home" size={size} color={color} /> }} />
-        <Tab.Screen name="SearchTab" component={SearchPhotosList} options={{ title: i18n.t('search'), tabBarIcon: ({ color, size }) => <Ionicon name="search" size={size} color={color} /> }} />
+        <Tab.Screen name="SearchTab" component={SearchScreen} options={{ title: i18n.t('search'), tabBarIcon: ({ color, size }) => <Ionicon name="search" size={size} color={color} /> }} />
         <Tab.Screen
           name="AddTab"
           component={PlaceholderScreen}
@@ -167,7 +167,7 @@ export default class App extends Component<{}, AppState> {
           <MenuProvider>
             <RootStack.Navigator>
               <RootStack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
-              <RootStack.Screen name="photoDetails" component={PhotoDetails} options={{ headerShown: false }} />
+              <RootStack.Screen name="photoDetails" component={PhotoDetailsScreen} options={{ headerShown: false }} />
               <RootStack.Screen name="PhotoListDetail" component={PhotoListDetailScreen} />
               <RootStack.Group screenOptions={{ presentation: 'modal' }}>
                 <RootStack.Screen name="SaveToList" component={SaveToListScreen} options={{ title: i18n.t('saveTo') }} />

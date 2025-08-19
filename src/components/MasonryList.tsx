@@ -2,7 +2,7 @@ import React from 'react';
 import { FlashList } from "@shopify/flash-list";
 import { ActivityIndicator } from 'react-native';
 import PhotoGridItem from './PhotoGridItem';
-import { PhotoEntry } from '../screens/PhotoList';
+import { PhotoEntry } from './PhotoList';
 
 interface MasonryListProps {
     photos: ReadonlyArray<PhotoEntry>;

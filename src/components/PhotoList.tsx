@@ -3,8 +3,8 @@ import { StyleSheet, View, SafeAreaView } from 'react-native';
 import UnsplashApiClient, { Photo } from '../api/UnsplashApiClient';
 import { RootStackParamList } from '../navigation/types';
 import { LayoutContext } from '../context/LayoutContext';
-import MasonryList from '../components/MasonryList';
-import LinearList from '../components/LinearList';
+import MasonryList from './MasonryList';
+import LinearList from './LinearList';
 
 export type PhotoEntry = {
     key: string;
