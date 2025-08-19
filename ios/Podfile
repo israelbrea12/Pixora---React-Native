@@ -45,4 +45,6 @@ target 'PixoraRN' do
       :mac_catalyst_enabled => false,
     )
   end
+
+  pod 'SDWebImage', '~> 5.0'
 end

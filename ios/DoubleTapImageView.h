@@ -5,8 +5,13 @@
 //  Created by Israel Brea Piñero on 19/8/25.
 //
 
-#ifndef DoubleTapImageView_h
-#define DoubleTapImageView_h
+#import <UIKit/UIKit.h>
+#import <React/RCTViewManager.h>
 
+// Heredamos de UIImageView para manejar imágenes
+@interface DoubleTapImageView : UIImageView
 
-#endif /* DoubleTapImageView_h */
+// Propiedad para el evento que se enviará a JS
+@property (nonatomic, copy) RCTBubblingEventBlock onDoubleTap;
+
+@end

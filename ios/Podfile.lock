@@ -1829,6 +1829,9 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - SDWebImage (5.21.1):
+    - SDWebImage/Core (= 5.21.1)
+  - SDWebImage/Core (5.21.1)
   - SocketRocket (0.7.1)
   - Yoga (0.0.0)
 
@@ -1913,10 +1916,12 @@ DEPENDENCIES:
   - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
+  - SDWebImage (~> 5.0)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
   trunk:
+    - SDWebImage
     - SocketRocket
 
 EXTERNAL SOURCES:
@@ -2159,9 +2164,10 @@ SPEC CHECKSUMS:
   RNPermissions: b15e1d2ff4fb127be338d93d8c21152ffb2e21c0
   RNScreens: 6edb124b97753c3978b2a7c8974672c0f31bc78a
   RNVectorIcons: 3a2173c340d645b9af2dfe39801ae470a1b0a9a7
+  SDWebImage: f29024626962457f3470184232766516dee8dfea
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: eca8dd841b7cd47d82d66be58af8e3aeb819012f
 
-PODFILE CHECKSUM: 82fe16c46dde78076956842eef252dfdf40f1e12
+PODFILE CHECKSUM: fdb4a601781548e447d9b6c1e8eb1f4d9a7f41bc
 
 COCOAPODS: 1.16.2

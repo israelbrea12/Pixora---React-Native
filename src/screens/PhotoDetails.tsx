@@ -292,9 +292,8 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
                             {/* --- 2. REEMPLAZA Animated.Image POR DoubleTapImage --- */}
                             <DoubleTapImage
                                 imageUrl={photo.urls.regular}
-                                onDoubleTap={this.toggleFavorite}
-                                // Combinas los estilos en un solo objeto usando el spread operator (...)
-                                style={{ ...styles.image, height: imageHeight }}
+                                onDoubleTap={this.toggleFavorite} // <-- 3. Conecta el evento a tu función
+                                style={[styles.image, { height: imageHeight }]}
                             />
 
                             {this.renderInteractionBar(photo)}

@@ -14,6 +14,7 @@
 		B0CE53F46D5A30BD10AE6054 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		C3794B6BBB6144F94E6F0F8D /* libPods-PixoraRN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F487574A810CE6E2E23CB2E0 /* libPods-PixoraRN.a */; };
 		D074FD69632C41DFB4592F75 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3161B33992414689814F0FF3 /* BootSplash.storyboard */; };
+		F65070D52E546D350057700B /* DoubleTapImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = F65070D42E546D350057700B /* DoubleTapImageView.m */; };
 		F6B272ED2E4DF934009E4836 /* PhotoSaver.m in Sources */ = {isa = PBXBuildFile; fileRef = F6B272EC2E4DF934009E4836 /* PhotoSaver.m */; };
 /* End PBXBuildFile section */
 
@@ -23,13 +24,15 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = PixoraRN/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = PixoraRN/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		2AD5DEC68DBB95287188265F /* Pods-PixoraRN.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PixoraRN.release.xcconfig"; path = "Target Support Files/Pods-PixoraRN/Pods-PixoraRN.release.xcconfig"; sourceTree = "<group>"; };
-		3161B33992414689814F0FF3 /* BootSplash.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = BootSplash.storyboard; path = PixoraRN/BootSplash.storyboard; sourceTree = "<group>"; };
+		3161B33992414689814F0FF3 /* BootSplash.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = BootSplash.storyboard; path = PixoraRN/BootSplash.storyboard; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = PixoraRN/AppDelegate.swift; sourceTree = "<group>"; };
-		8049FF55C1C14A62B34A6343 /* Colors.xcassets */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; name = Colors.xcassets; path = PixoraRN/Colors.xcassets; sourceTree = "<group>"; };
+		8049FF55C1C14A62B34A6343 /* Colors.xcassets */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; name = Colors.xcassets; path = PixoraRN/Colors.xcassets; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = PixoraRN/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		CDBD311082D48C5247D320BE /* Pods-PixoraRN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PixoraRN.debug.xcconfig"; path = "Target Support Files/Pods-PixoraRN/Pods-PixoraRN.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F487574A810CE6E2E23CB2E0 /* libPods-PixoraRN.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PixoraRN.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F65070D12E546C590057700B /* DoubleTapImageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DoubleTapImageView.h; sourceTree = "<group>"; };
+		F65070D42E546D350057700B /* DoubleTapImageView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DoubleTapImageView.m; sourceTree = "<group>"; };
 		F6B272EA2E4DF8FD009E4836 /* PhotoSaver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhotoSaver.h; sourceTree = "<group>"; };
 		F6B272EC2E4DF934009E4836 /* PhotoSaver.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PhotoSaver.m; sourceTree = "<group>"; };
 		F6B272EE2E4DFBEA009E4836 /* PixoraRN-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PixoraRN-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -60,6 +63,8 @@
 				F6B272EE2E4DFBEA009E4836 /* PixoraRN-Bridging-Header.h */,
 				3161B33992414689814F0FF3 /* BootSplash.storyboard */,
 				8049FF55C1C14A62B34A6343 /* Colors.xcassets */,
+				F65070D12E546C590057700B /* DoubleTapImageView.h */,
+				F65070D42E546D350057700B /* DoubleTapImageView.m */,
 			);
 			name = PixoraRN;
 			sourceTree = "<group>";
@@ -263,6 +268,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F6B272ED2E4DF934009E4836 /* PhotoSaver.m in Sources */,
+				F65070D52E546D350057700B /* DoubleTapImageView.m in Sources */,
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
