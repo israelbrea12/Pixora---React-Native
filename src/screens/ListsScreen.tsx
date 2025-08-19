@@ -1,4 +1,3 @@
-// src/screens/ListsScreen.tsx
 import React, { Component } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import { getPhotoLists, PhotoListInfo } from '../services/DatabaseManager';
@@ -32,7 +31,6 @@ export default class ListsScreen extends Component<ListsScreenProps, State> {
     };
 
     handleListPress = (list: PhotoListInfo) => {
-        // Ahora la llamada a navigate es 100% correcta y segura
         this.props.navigation.navigate('PhotoListDetail', {
             listId: list.id,
             listName: list.name,
@@ -48,7 +46,6 @@ export default class ListsScreen extends Component<ListsScreenProps, State> {
             <FlatList
                 data={this.state.lists}
                 keyExtractor={item => item.id.toString()}
-                // 2. Modifica el renderItem para que muestre la imagen o el placeholder
                 renderItem={({ item }) => (
                     <TouchableOpacity
                         style={styles.itemContainer}
@@ -74,7 +71,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 12,
         paddingHorizontal: 16,
-        backgroundColor: '#fff', // Un fondo blanco para cada item
+        backgroundColor: '#fff',
         borderBottomWidth: 1,
         borderBottomColor: '#f0f0f0',
     },

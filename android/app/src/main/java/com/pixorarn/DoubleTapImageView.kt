@@ -7,7 +7,6 @@ import androidx.appcompat.widget.AppCompatImageView
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.uimanager.events.RCTEventEmitter
 
-// Cambiamos AppCompatTextView por AppCompatImageView para manejar imágenes
 class DoubleTapImageView(context: Context) : AppCompatImageView(context),
     GestureDetector.OnGestureListener,
     GestureDetector.OnDoubleTapListener {
@@ -16,7 +15,6 @@ class DoubleTapImageView(context: Context) : AppCompatImageView(context),
         setOnDoubleTapListener(this@DoubleTapImageView)
     }
 
-    // Pasamos los eventos de toque a nuestro detector de gestos
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event != null && gestureDetector.onTouchEvent(event)) {
             return true
@@ -24,18 +22,16 @@ class DoubleTapImageView(context: Context) : AppCompatImageView(context),
         return super.onTouchEvent(event)
     }
 
-    // Cuando se detecta un doble toque, emitimos un evento a React Native
     override fun onDoubleTap(e: MotionEvent): Boolean {
         val reactContext = context as ReactContext
         reactContext.getJSModule(RCTEventEmitter::class.java).receiveEvent(
             id,
-            "doubleTap", // Nombre del evento
+            "doubleTap",
             null
         )
         return true
     }
 
-    // Métodos requeridos por la interfaz GestureDetector, podemos dejarlos como están
     override fun onDown(e: MotionEvent): Boolean = true
     override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean = true
     override fun onLongPress(e: MotionEvent) {}

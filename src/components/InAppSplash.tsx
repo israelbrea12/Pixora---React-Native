@@ -3,35 +3,29 @@ import { Animated, Easing, StatusBar, StyleSheet } from 'react-native';
 import LottieView from 'lottie-react-native';
 import BootSplash from 'react-native-bootsplash';
 
-// Definimos las props que el componente aceptará
 interface Props {
-    onFinished: () => void; // Una función que se llamará cuando todo termine
+    onFinished: () => void;
 }
 
 export default function InAppSplash({ onFinished }: Props) {
     const opacity = useRef(new Animated.Value(1)).current;
 
     useEffect(() => {
-        // Ocultamos el splash nativo del sistema
         BootSplash.hide({ fade: true });
 
-        // Duración total que la splash estará visible
-        const TOTAL_SPLASH_DURATION = 2000; // 3.5 segundos
+        const TOTAL_SPLASH_DURATION = 2000;
 
         const hideTimer = setTimeout(() => {
-            // Inicia la animación de desvanecimiento
             Animated.timing(opacity, {
                 toValue: 0,
                 duration: 400,
                 easing: Easing.out(Easing.ease),
                 useNativeDriver: true,
             }).start(() => {
-                // Cuando la animación TERMINA, llama a la función onFinished
                 onFinished();
             });
         }, TOTAL_SPLASH_DURATION);
 
-        // Limpia el temporizador si el componente se desmonta
         return () => clearTimeout(hideTimer);
 
     }, [opacity, onFinished]);

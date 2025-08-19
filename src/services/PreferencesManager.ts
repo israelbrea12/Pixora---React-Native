@@ -1,4 +1,3 @@
-// src/services/PreferencesManager.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Modo de visualización
@@ -17,11 +16,10 @@ export const saveLayoutMode = async (mode: LayoutMode): Promise<void> => {
 export const getLayoutMode = async (): Promise<LayoutMode> => {
     try {
         const mode = await AsyncStorage.getItem(LAYOUT_MODE_KEY);
-        // Devuelve el modo guardado, o 'masonry' por defecto si no hay nada.
         return (mode as LayoutMode) || 'masonry';
     } catch (e) {
         console.error("Failed to fetch layout mode.", e);
-        return 'masonry'; // Devuelve el modo por defecto en caso de error
+        return 'masonry';
     }
 };
 

@@ -1,9 +1,6 @@
-// src/screens/PhotoList.tsx
-
 import React, { Component } from 'react';
 import { StyleSheet, View, SafeAreaView } from 'react-native';
 import UnsplashApiClient, { Photo } from '../api/UnsplashApiClient';
-// --- CAMBIO 1: Importamos los tipos que necesitamos para definir la navegación ---
 import { RootStackParamList } from '../navigation/types';
 import { LayoutContext } from '../context/LayoutContext';
 import MasonryList from '../components/MasonryList';
@@ -14,9 +11,6 @@ export type PhotoEntry = {
     photo: Photo;
 };
 
-// --- CAMBIO 2: Reemplazamos la unión de tipos por una interfaz más flexible ---
-// Esto define las capacidades mínimas que necesita la prop 'navigation'.
-// Todos los tipos de props de pantalla (HomeScreenProps, FavoritesScreenProps, etc.) cumplen este contrato.
 type PhotoListNavProps = {
     navigation: {
         navigate<RouteName extends keyof RootStackParamList>(
@@ -38,8 +32,6 @@ export default abstract class PhotoList<
     P extends PhotoListNavProps = PhotoListNavProps,
     S extends PhotoListState = PhotoListState
 > extends Component<P, S> {
-
-    // El resto del fichero no cambia en absoluto.
 
     protected apiClient: UnsplashApiClient = new UnsplashApiClient();
     protected nextPage: number = 1;
@@ -120,7 +112,6 @@ export default abstract class PhotoList<
     }
 
     private onPhotoPressed = (photo: Photo) => {
-        // Ahora la llamada a .navigate() es válida porque nuestro tipo flexible lo permite.
         this.props.navigation.navigate('photoDetails', { photo: photo });
     }
 }
@@ -128,7 +119,7 @@ export default abstract class PhotoList<
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#fff', // Es bueno darle un color de fondo
+        backgroundColor: '#fff',
     },
     container: {
         flex: 1,

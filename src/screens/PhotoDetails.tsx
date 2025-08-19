@@ -17,12 +17,11 @@ interface PhotoSaverInterface {
 
 const PhotoSaver = NativeModules.PhotoSaver as PhotoSaverInterface;
 
-// Estado local para la vista, incluyendo el estado de la UI
 interface PhotoDetailsState {
     photo: Photo;
     isLoading: boolean;
-    isFavorite: boolean; // Para simular si es favorito
-    isSaved: boolean;    // Para simular si está guardado
+    isFavorite: boolean;
+    isSaved: boolean;
     isDownloading: boolean;
 }
 
@@ -32,8 +31,8 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
     private focusListener: any;
     private imageOpacity = new Animated.Value(0);
     private imageScale = new Animated.Value(0.9);
-    private heartScale = new Animated.Value(1); // Escala para el corazón
-    private saveButtonScale = new Animated.Value(1); // Escala para el botón de guardar
+    private heartScale = new Animated.Value(1);
+    private saveButtonScale = new Animated.Value(1);
 
     public constructor(props: PhotoDetailsScreenProps) {
         super(props);
@@ -43,19 +42,16 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
         this.state = {
             photo: photo,
             isLoading: true,
-            isFavorite: false, // Valor inicial para la demo
-            isSaved: false,    // Valor inicial para la demo
+            isFavorite: false,
+            isSaved: false,
             isDownloading: false,
         };
-
-        // Ya no necesitamos setOptions para el título porque el header está oculto
     }
 
     public componentDidMount() {
         if (this.photoID.startsWith('user_')) {
             this.setState({ isLoading: false });
         } else {
-            // Si es una foto de Unsplash, sí buscamos los detalles.
             this.apiClient
                 .getPhotoDetails(this.photoID)
                 .then(fullPhotoDetails => {
@@ -75,33 +71,29 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
         this.checkStatus();
         this.focusListener = this.props.navigation.addListener('focus', this.checkStatus);
         Animated.parallel([
-            // Animación de timing para la opacidad (de 0 a 1) [cite: 28, 35]
             Animated.timing(this.imageOpacity, {
                 toValue: 1,
-                duration: 600, // 600 milisegundos
+                duration: 600,
                 useNativeDriver: true,
             }),
-            // Animación de spring para la escala (de 0.9 a 1 con rebote) [cite: 43, 52]
             Animated.spring(this.imageScale, {
                 toValue: 1,
                 friction: 5,
                 useNativeDriver: true,
             }),
-        ]).start(); // Iniciamos la animación [cite: 70, 71]
+        ]).start();
     }
 
     public componentWillUnmount() {
-        // Limpiamos el listener para evitar memory leaks al cerrar la pantalla
         if (this.focusListener) {
             this.props.navigation.removeListener('focus', this.checkStatus);
         }
     }
 
     componentDidUpdate(prevProps: PhotoDetailsScreenProps, prevState: PhotoDetailsState) {
-        // Si el estado de 'isSaved' ha cambiado...
         if (prevState.isSaved !== this.state.isSaved) {
-            this.saveButtonScale.setValue(0.9); // Lo hacemos un poco más pequeño
-            Animated.timing(this.saveButtonScale, { // Usamos timing para un efecto más suave
+            this.saveButtonScale.setValue(0.9);
+            Animated.timing(this.saveButtonScale, {
                 toValue: 1,
                 duration: 300,
                 useNativeDriver: true,
@@ -109,20 +101,17 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
         }
     }
 
-    // --- Funciones para simular interacciones ---
     private toggleFavorite = () => {
-        // Animación de rebote para el corazón
-        this.heartScale.setValue(0.8); // Lo hacemos un poco más pequeño
+        this.heartScale.setValue(0.8);
         Animated.spring(this.heartScale, {
             toValue: 1,
-            friction: 3, // Controla la fuerza del "muelle"
+            friction: 3,
             useNativeDriver: true,
         }).start();
 
         const { isFavorite, photo } = this.state;
         const newIsFavorite = !isFavorite;
 
-        // La lógica de la base de datos se ejecuta de forma asíncrona
         const dbOperation = newIsFavorite ? addFavorite(photo) : removeFavorite(photo.id);
         dbOperation
             .then(() => {
@@ -194,16 +183,13 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
         } catch (error: any) {
             Alert.alert(i18n.t('saveError'), error.message);
         } finally {
-            // Haya éxito o error, paramos la descarga
             this.setState({ isDownloading: false });
         }
     };
-    // --- Sub-componentes de renderizado ---
 
     private renderInteractionBar(photo: Photo) {
         const { isFavorite, isSaved, isDownloading } = this.state;
 
-        // --- CAMBIO 5: Aplicamos los estilos de transformación animados ---
         const animatedHeartStyle = {
             transform: [{ scale: this.heartScale }],
         };
@@ -235,7 +221,7 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
                     </TouchableOpacity>
                 </View>
 
-                {/* Lado Derecho: Botón de Guardar en Lista */}
+                { }
                 <Animated.View style={animatedSaveButtonStyle}>
                     <TouchableOpacity
                         onPress={this.openSaveToListScreen}
@@ -289,10 +275,10 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
                 <View style={styles.wrapper}>
                     <ScrollView>
                         <View style={styles.container}>
-                            {/* --- 2. REEMPLAZA Animated.Image POR DoubleTapImage --- */}
+                            { }
                             <DoubleTapImage
                                 imageUrl={photo.urls.regular}
-                                onDoubleTap={this.toggleFavorite} // <-- 3. Conecta el evento a tu función
+                                onDoubleTap={this.toggleFavorite}
                                 style={[styles.image, { height: imageHeight }]}
                             />
 
@@ -313,8 +299,6 @@ export default class PhotoDetails extends Component<PhotoDetailsScreenProps, Pho
     }
 }
 
-
-// --- NUEVOS ESTILOS ---
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
@@ -328,7 +312,7 @@ const styles = StyleSheet.create({
     },
     wrapper: {
         flex: 1,
-        position: 'relative', // Necesario para que 'absolute' funcione correctamente dentro
+        position: 'relative',
     },
     container: {
         paddingBottom: 40,
@@ -368,23 +352,23 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
         color: '#333',
-        marginRight: 20, // Espacio después del número de likes
+        marginRight: 20,
     },
     leftActions: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     actionButton: {
-        marginRight: 15, // Espacio entre los botones de la izquierda
+        marginRight: 15,
     },
     saveButton: {
-        backgroundColor: '#007AFF', // Azul primario
+        backgroundColor: '#007AFF',
         paddingVertical: 10,
         paddingHorizontal: 20,
         borderRadius: 20,
     },
     saveButtonSaved: {
-        backgroundColor: '#797979ff', // Verde para "guardado"
+        backgroundColor: '#797979ff',
     },
     saveButtonText: {
         color: '#fff',

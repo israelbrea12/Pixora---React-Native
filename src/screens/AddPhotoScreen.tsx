@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { Text, TextInput, Image, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 import { AddPhotoScreenProps } from '../navigation/types';
 import i18n from '../i18n/LocalizationManager';
@@ -8,7 +8,7 @@ import { Photo } from '../api/UnsplashApiClient';
 
 const AddPhotoScreen = ({ navigation, route }: AddPhotoScreenProps) => {
     const { imageUri } = route.params;
-    const [username, setUsername] = useState('MiUsuario'); // Valor por defecto
+    const [username, setUsername] = useState('MiUsuario');
     const [description, setDescription] = useState('');
 
     const handleUpload = async () => {
@@ -17,14 +17,13 @@ const AddPhotoScreen = ({ navigation, route }: AddPhotoScreenProps) => {
             return;
         }
 
-        // Creamos un objeto 'Photo' compatible con el resto de la app
         const newPhoto: Photo = {
             id: `user_${Date.now()}`,
             description: description,
             alt_description: description,
             likes: 0,
-            width: 1080, // Valor de ejemplo
-            height: 1920, // Valor de ejemplo
+            width: 1080,
+            height: 1920,
             urls: {
                 raw: imageUri,
                 full: imageUri,
@@ -47,7 +46,6 @@ const AddPhotoScreen = ({ navigation, route }: AddPhotoScreenProps) => {
         try {
             await addUserPhoto(newPhoto);
             Alert.alert(i18n.t('success'), i18n.t('photoUploaded'));
-            // Navegamos al perfil y la pestaña "Mis Fotos" se actualizará sola gracias al 'focus listener'
             navigation.dispatch(
                 CommonActions.reset({
                     index: 0,

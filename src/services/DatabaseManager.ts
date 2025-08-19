@@ -1,26 +1,23 @@
-// src/services/DatabaseManager.ts
 import SQLite from 'react-native-sqlite-2';
 import { Photo } from '../api/UnsplashApiClient';
 
 const db = SQLite.openDatabase('pixora.db', '1.0', '', 1);
 
-// --- NUEVO TIPO: Para la información de una lista de fotos ---
 export type PhotoListInfo = {
     id: number;
     name: string;
     lastPhotoUrl?: string;
 }
 
-// --- NUEVOS TIPOS: Para la actividad del usuario ---
 export type UserActivityType = 'LIKE' | 'ADD_TO_LIST';
 
 
 export interface UserActivity {
     id: number;
     type: UserActivityType;
-    timestamp: number; // Guardaremos la fecha como un número (milisegundos)
+    timestamp: number;
     photo: Photo;
-    listName?: string; // Opcional, solo para 'ADD_TO_LIST'
+    listName?: string;
 }
 
 export const initDB = (): void => {
@@ -29,12 +26,10 @@ export const initDB = (): void => {
             `CREATE TABLE IF NOT EXISTS Favorites (id TEXT PRIMARY KEY NOT NULL, photoData TEXT NOT NULL)`,
             []
         );
-        // --- NUEVA TABLA: Para guardar los nombres de las listas ---
         txn.executeSql(
             `CREATE TABLE IF NOT EXISTS PhotoLists (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL UNIQUE)`,
             []
         );
-        // --- NUEVA TABLA: Para relacionar fotos y listas (relación muchos a muchos) ---
         txn.executeSql(
             `CREATE TABLE IF NOT EXISTS ListEntries (
                 listId INTEGER NOT NULL,
@@ -63,7 +58,6 @@ export const initDB = (): void => {
     });
 };
 
-// --- Funciones para Listas (NUEVAS) ---
 
 export const createPhotoList = (name: string): Promise<void> => {
     return new Promise((resolve, reject) => {
@@ -76,7 +70,6 @@ export const createPhotoList = (name: string): Promise<void> => {
 export const getPhotoLists = (): Promise<PhotoListInfo[]> => {
     return new Promise((resolve, reject) => {
         db.transaction(txn => {
-            // La nueva consulta usa una subconsulta para buscar la última foto de cada lista
             const sqlQuery = `
                 SELECT
                     pl.id,
@@ -95,11 +88,10 @@ export const getPhotoLists = (): Promise<PhotoListInfo[]> => {
                     const item = rows.item(i);
                     let lastPhotoUrl: string | undefined = undefined;
 
-                    // Si encontramos datos de una foto, los parseamos para extraer la URL
                     if (item.lastPhotoData) {
                         try {
                             const photo: Photo = JSON.parse(item.lastPhotoData);
-                            lastPhotoUrl = photo.urls.thumb; // Usamos el thumbnail
+                            lastPhotoUrl = photo.urls.thumb;
                         } catch (e) {
                             console.error("Error parsing last photo data:", e);
                         }
@@ -108,7 +100,7 @@ export const getPhotoLists = (): Promise<PhotoListInfo[]> => {
                     lists.push({
                         id: item.id,
                         name: item.name,
-                        lastPhotoUrl: lastPhotoUrl, // Añadimos la URL al objeto
+                        lastPhotoUrl: lastPhotoUrl,
                     });
                 }
                 resolve(lists);
@@ -124,7 +116,7 @@ export const addPhotoToList = (listId: number, photo: Photo, listName: string): 
             txn.executeSql('INSERT OR IGNORE INTO ListEntries (listId, photoId, photoData) VALUES (?, ?, ?)',
                 [listId, photo.id, JSON.stringify(photo)],
                 async () => {
-                    await logActivity('ADD_TO_LIST', photo, listName); // Registramos que se guardó
+                    await logActivity('ADD_TO_LIST', photo, listName);
                     resolve();
                 },
                 (_, err) => { reject(err); return false; });
@@ -142,11 +134,6 @@ export const isPhotoSaved = (photoId: string): Promise<boolean> => {
     });
 };
 
-/**
- * Obtiene todas las fotos que pertenecen a una lista específica.
- * @param listId El ID de la lista.
- * @returns Una promesa que resuelve a un array de objetos Photo.
- */
 export const getPhotosInList = (listId: number): Promise<Photo[]> => {
     return new Promise((resolve, reject) => {
         db.transaction(txn => {
@@ -166,16 +153,13 @@ export const getPhotosInList = (listId: number): Promise<Photo[]> => {
     });
 };
 
-
-// --- Funciones de Favoritos (sin cambios) ---
-
 export const addFavorite = (photo: Photo): Promise<void> => {
     return new Promise((resolve, reject) => {
         db.transaction(txn => {
             txn.executeSql('INSERT OR REPLACE INTO Favorites (id, photoData) VALUES (?, ?)',
                 [photo.id, JSON.stringify(photo)],
                 async () => {
-                    await logActivity('LIKE', photo); // Registramos el "Me Gusta"
+                    await logActivity('LIKE', photo);
                     resolve();
                 },
                 (_, error) => { reject(error); return false; });
@@ -214,8 +198,6 @@ export const isFavorite = (photoId: string): Promise<boolean> => {
         });
     });
 };
-
-// --- NUEVAS FUNCIONES: Para registrar y obtener actividad ---
 
 const logActivity = (type: UserActivityType, photo: Photo, listName?: string): Promise<void> => {
     return new Promise((resolve, reject) => {
@@ -256,11 +238,6 @@ export const getActivities = (): Promise<UserActivity[]> => {
     });
 };
 
-// --- NUEVAS FUNCIONES PARA FOTOS DEL USUARIO ---
-
-/**
- * Añade una foto subida por el usuario a la base de datos local.
- */
 export const addUserPhoto = (photo: Photo): Promise<void> => {
     return new Promise((resolve, reject) => {
         db.transaction(txn => {
@@ -272,9 +249,6 @@ export const addUserPhoto = (photo: Photo): Promise<void> => {
     });
 };
 
-/**
- * Obtiene todas las fotos subidas por el usuario.
- */
 export const getUserPhotos = (): Promise<Photo[]> => {
     return new Promise((resolve, reject) => {
         db.transaction(txn => {

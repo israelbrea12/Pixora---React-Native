@@ -1,4 +1,3 @@
-// android/app/src/main/java/com/pixorarn/PhotoSaverModule.kt
 package com.pixorarn
 
 import android.content.ContentValues
@@ -19,22 +18,16 @@ import java.net.URL
 
 class PhotoSaverModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
-    // Creamos un "scope" de coroutines que se ejecuta en un hilo de fondo (IO).
-    // Esto es ideal para operaciones de red y de disco.
     private val moduleScope = CoroutineScope(Dispatchers.IO)
 
     override fun getName() = "PhotoSaver"
 
     @ReactMethod
     fun savePhoto(urlString: String, promise: Promise) {
-        // Lanzamos una nueva coroutine en nuestro scope de fondo.
-        // Todo lo que está dentro de 'launch' ya no bloquea el hilo principal.
         moduleScope.launch {
             try {
-                // 1. Descargar la imagen directamente (sin Picasso)
                 val url = URL(urlString)
                 val bitmap: Bitmap?
-                // 'use' se encarga de cerrar el stream automáticamente
                 url.openStream().use { inputStream ->
                     bitmap = BitmapFactory.decodeStream(inputStream)
                 }
@@ -72,7 +65,6 @@ class PhotoSaverModule(reactContext: ReactApplicationContext) : ReactContextBase
                     return@launch
                 }
 
-                // Usamos 'use' también aquí para asegurar que el stream se cierre
                 stream.use {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
                 }
@@ -86,10 +78,8 @@ class PhotoSaverModule(reactContext: ReactApplicationContext) : ReactContextBase
                 promise.resolve("¡Foto guardada en la galería! 🎉")
 
             } catch (e: IOException) {
-                // Error de red o al decodificar la imagen
                 promise.reject("DOWNLOAD_ERROR", "No se pudo descargar o decodificar la imagen: ${e.message}", e)
             } catch (e: Exception) {
-                // Cualquier otro error durante el guardado
                 promise.reject("SAVE_ERROR", "Error al guardar la imagen: ${e.message}", e)
             }
         }

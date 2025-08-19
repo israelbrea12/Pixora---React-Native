@@ -1,4 +1,3 @@
-// src/screens/SaveToListScreen.tsx
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, Image } from 'react-native';
 import { SaveToListScreenProps } from '../navigation/types';
@@ -9,18 +8,17 @@ import i18n from '../i18n/LocalizationManager';
 
 interface State {
     lists: PhotoListInfo[];
-    isPromptVisible: boolean; // Estado para controlar nuestro modal
+    isPromptVisible: boolean;
 }
 
 export default class SaveToListScreen extends Component<SaveToListScreenProps, State> {
 
     state: State = {
         lists: [],
-        isPromptVisible: false, // Inicialmente oculto
+        isPromptVisible: false,
     };
 
     componentDidMount() {
-        // Ponemos un título al modal
         this.props.navigation.setOptions({ title: i18n.t('saveTo') });
         this.fetchLists();
     }
@@ -35,11 +33,11 @@ export default class SaveToListScreen extends Component<SaveToListScreenProps, S
     };
 
     submitNewList = async (name: string) => {
-        this.setState({ isPromptVisible: false }); // Cerramos el modal
+        this.setState({ isPromptVisible: false });
         if (name && name.trim().length > 0) {
             try {
                 await createPhotoList(name.trim());
-                this.fetchLists(); // Refrescamos la lista
+                this.fetchLists();
             } catch (e) {
                 Alert.alert(i18n.t('error'), i18n.t('listExistsError'));
             }
@@ -49,7 +47,6 @@ export default class SaveToListScreen extends Component<SaveToListScreenProps, S
     handleSelectList = async (list: PhotoListInfo) => {
         const { photo } = this.props.route.params;
         try {
-            // --- CAMBIO: Pasamos el nombre de la lista a la función ---
             await addPhotoToList(list.id, photo, list.name);
             Alert.alert(i18n.t('saved'), i18n.t('photoSavedToList', { listName: list.name }));
             this.props.navigation.goBack();
@@ -64,7 +61,6 @@ export default class SaveToListScreen extends Component<SaveToListScreenProps, S
                 <FlatList
                     data={this.state.lists}
                     keyExtractor={item => item.id.toString()}
-                    // --- CAMBIO 2: Actualiza el renderItem para mostrar la imagen o el placeholder ---
                     renderItem={({ item }) => (
                         <TouchableOpacity style={styles.itemContainer} onPress={() => this.handleSelectList(item)}>
                             {item.lastPhotoUrl ? (
@@ -75,7 +71,6 @@ export default class SaveToListScreen extends Component<SaveToListScreenProps, S
                             <Text style={styles.itemTitle}>{item.name}</Text>
                         </TouchableOpacity>
                     )}
-                    // --- CAMBIO 3: Actualiza el ListHeaderComponent para mantener la consistencia del diseño ---
                     ListHeaderComponent={
                         <TouchableOpacity style={styles.itemContainer} onPress={this.handleCreateList}>
                             <View style={[styles.placeholder, styles.addIconContainer]}>
@@ -111,13 +106,13 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 8,
-        backgroundColor: '#e1e4e8', // Color de fondo mientras carga
+        backgroundColor: '#e1e4e8',
     },
     placeholder: {
         width: 50,
         height: 50,
         borderRadius: 8,
-        backgroundColor: '#e1e4e8', // El placeholder gris
+        backgroundColor: '#e1e4e8',
     },
     addIconContainer: {
         justifyContent: 'center',
@@ -130,6 +125,6 @@ const styles = StyleSheet.create({
     itemTitle: {
         fontSize: 17,
         marginLeft: 16,
-        flex: 1, // Para que el texto ocupe el espacio restante
+        flex: 1,
     },
 });

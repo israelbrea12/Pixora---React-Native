@@ -1,4 +1,3 @@
-// src/screens/PhotoListDetailScreen.tsx
 import PhotoList, { PhotoListState } from './PhotoList';
 import { getPhotosInList } from '../services/DatabaseManager';
 import { Photo } from '../api/UnsplashApiClient';
@@ -13,7 +12,6 @@ export default class PhotoListDetailScreen extends PhotoList<PhotoListDetailScre
 
     constructor(props: PhotoListDetailScreenProps) {
         super(props);
-        // El tipo 'PhotoListDetailScreenProps' asegura que route.params existe y tiene la forma correcta
         const { listId, listName } = props.route.params;
         this.listId = listId;
         this.listName = listName;
@@ -24,7 +22,6 @@ export default class PhotoListDetailScreen extends PhotoList<PhotoListDetailScre
         super.componentDidMount();
     }
 
-    // --- CORRECCIÓN: La firma de la función debe coincidir con la de la clase padre ---
     protected loadPage = async (page: number): Promise<{ photos: ReadonlyArray<Photo>, totalPages: number }> => {
         if (page > 1) {
             return { photos: [], totalPages: 1 };

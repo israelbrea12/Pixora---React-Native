@@ -18,7 +18,6 @@ export default class SearchPhotosList extends PhotoList<SearchScreenProps, Searc
         query: '',
     };
 
-    // Propiedad para guardar el temporizador del debounce
     private debounceTimer: NodeJS.Timeout | null = null;
 
     public constructor(props: SearchScreenProps) {
@@ -28,10 +27,6 @@ export default class SearchPhotosList extends PhotoList<SearchScreenProps, Searc
         });
     }
 
-    /**
-     * Al destruir el componente, limpiamos cualquier temporizador que haya quedado pendiente
-     * para evitar memory leaks.
-     */
     public componentWillUnmount() {
         if (this.debounceTimer) {
             clearTimeout(this.debounceTimer);
@@ -39,15 +34,10 @@ export default class SearchPhotosList extends PhotoList<SearchScreenProps, Searc
     }
 
     protected loadPage(page: number): Promise<{ photos: ReadonlyArray<Photo>; totalPages: number }> {
-        // Si el query está vacío, buscamos "popular" por defecto.
         const queryToSearch = this.state.query.trim() === '' ? 'popular' : this.state.query;
         return this.apiClient.searchPhotos(queryToSearch, page);
     }
 
-    /**
-     * Este método se llama en cada cambio del TextInput.
-     * Implementa la lógica de "debounce".
-     */
     private onQueryChanged = (text: string) => {
         if (this.debounceTimer) {
             clearTimeout(this.debounceTimer);
@@ -57,12 +47,9 @@ export default class SearchPhotosList extends PhotoList<SearchScreenProps, Searc
 
         this.debounceTimer = setTimeout(() => {
             this.handleSearch();
-        }, 500); // Espera 500ms antes de buscar
+        }, 500);
     };
 
-    /**
-     * Inicia una nueva búsqueda, reseteando la paginación y la lista de fotos.
-     */
     private handleSearch = () => {
         this.nextPage = 1;
         this.totalPages = 1;

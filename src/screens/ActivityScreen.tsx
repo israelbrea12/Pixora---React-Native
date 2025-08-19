@@ -1,11 +1,9 @@
-// src/screens/ActivityScreen.tsx
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator, SafeAreaView } from 'react-native';
 import { getActivities, UserActivity } from '../services/DatabaseManager';
 import { ActivityScreenProps } from '../navigation/types';
 import i18n from '../i18n/LocalizationManager';
 
-// --- Componente para un item de la lista de actividad ---
 const ActivityItem = ({ item }: { item: UserActivity }) => {
     const date = new Date(item.timestamp);
     const formattedDate = `${date.toLocaleDateString()} a las ${date.toLocaleTimeString()}`;
@@ -63,7 +61,6 @@ export default class ActivityScreen extends Component<ActivityScreenProps, State
             );
         }
 
-        // --- CAMBIO 2: Envolvemos todo en un SafeAreaView y añadimos la barra de título ---
         return (
             <SafeAreaView style={styles.safeArea}>
                 <View style={styles.topBarContainer}>
@@ -81,14 +78,13 @@ export default class ActivityScreen extends Component<ActivityScreenProps, State
     }
 }
 
-// --- CAMBIO 3: Añadimos los nuevos estilos y reutilizamos los de ProfileScreen ---
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
         backgroundColor: '#fff'
     },
     topBarContainer: {
-        alignItems: 'center', // Centramos el título
+        alignItems: 'center',
         paddingVertical: 12,
         borderBottomWidth: 1,
         borderBottomColor: '#eee',

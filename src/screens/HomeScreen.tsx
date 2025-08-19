@@ -1,10 +1,7 @@
-// src/screens/HomeScreen.tsx
-
 import React from 'react';
 import { ScrollView, Text, TouchableOpacity, StyleSheet, View } from 'react-native';
 import PhotoList, { PhotoListState } from './PhotoList';
 import { Photo } from '../api/UnsplashApiClient';
-// --- CAMBIO 1: Importamos el tipo de props específico para esta pantalla ---
 import { HomeScreenProps } from '../navigation/types';
 import i18n from '../i18n/LocalizationManager';
 
@@ -20,7 +17,6 @@ interface HomeState extends PhotoListState {
     selectedCategory: string;
 }
 
-// --- CAMBIO 2: Le decimos a la clase que usará HomeScreenProps ---
 export default class HomeScreen extends PhotoList<HomeScreenProps, HomeState> {
 
     protected listLayout: 'list' | 'grid' = 'grid';
@@ -30,7 +26,6 @@ export default class HomeScreen extends PhotoList<HomeScreenProps, HomeState> {
         selectedCategory: CATEGORIES[0].key,
     };
 
-    // --- CAMBIO 3: El constructor ahora espera recibir HomeScreenProps ---
     public constructor(props: HomeScreenProps) {
         super(props);
         props.navigation.setOptions({
@@ -49,7 +44,6 @@ export default class HomeScreen extends PhotoList<HomeScreenProps, HomeState> {
 
         this.nextPage = 1;
         this.totalPages = 1;
-        // Usamos la forma funcional de setState para actualizar el estado de forma segura
         this.setState(
             prevState => ({ ...prevState, photos: [], selectedCategory: category }),
             () => {

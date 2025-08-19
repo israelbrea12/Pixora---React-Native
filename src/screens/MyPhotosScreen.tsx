@@ -4,7 +4,6 @@ import { getUserPhotos } from '../services/DatabaseManager';
 import { Photo } from '../api/UnsplashApiClient';
 import { MyPhotosScreenProps } from '../navigation/types';
 
-// La pantalla de Mis Fotos hereda de PhotoList para reutilizar la UI
 export default class MyPhotosScreen extends PhotoList<MyPhotosScreenProps, PhotoListState> {
 
     public state: PhotoListState = { photos: [] };
@@ -13,12 +12,10 @@ export default class MyPhotosScreen extends PhotoList<MyPhotosScreenProps, Photo
 
     public componentDidMount() {
         super.componentDidMount();
-        // Cuando la pantalla obtiene el foco, recargamos los datos.
         this.focusListener = this.props.navigation.addListener('focus', this.reloadData);
     }
 
     public componentWillUnmount() {
-        // Limpiamos el listener al desmontar el componente
         if (this.focusListener) {
             this.focusListener();
         }
@@ -39,7 +36,6 @@ export default class MyPhotosScreen extends PhotoList<MyPhotosScreenProps, Photo
 
         try {
             const userPhotos = await getUserPhotos();
-            // Invertimos el array para mostrar los más recientes primero
             return { photos: userPhotos.reverse(), totalPages: 1 };
         } catch (error) {
             console.error("Error fetching user photos:", error);

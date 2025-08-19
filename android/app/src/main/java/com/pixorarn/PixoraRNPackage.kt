@@ -1,4 +1,3 @@
-// android/app/src/main/java/com/pixorarn/PhotoSaverPackage.kt
 package com.pixorarn
 
 import com.facebook.react.ReactPackage
@@ -8,7 +7,6 @@ import com.facebook.react.uimanager.ViewManager
 
 class PixoraRNPackage : ReactPackage {
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
-        // La creación de listas en Kotlin es más simple
         return listOf(PhotoSaverModule(reactContext))
     }
 

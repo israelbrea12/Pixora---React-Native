@@ -1,22 +1,17 @@
-// src/navigation/types.ts
-
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Photo } from '../api/UnsplashApiClient';
 import { MaterialTopTabScreenProps } from '@react-navigation/material-top-tabs';
 import { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
-// --- ÚNICO PARAMLIST PARA EL STACK RAÍZ ---
-// Define TODAS las pantallas de la aplicación.
 export type RootStackParamList = {
-    MainTabs: NavigatorScreenParams<TabParamList>; // La pantalla que contiene el TabNavigator
+    MainTabs: NavigatorScreenParams<TabParamList>;
     photoDetails: { photo: Photo };
     SaveToList: { photo: Photo };
     PhotoListDetail: { listId: number; listName: string };
     AddPhoto: { imageUri: string };
 };
 
-// Define las pestañas del navegador inferior
 export type TabParamList = {
     HomeTab: undefined;
     SearchTab: undefined;
@@ -25,15 +20,11 @@ export type TabParamList = {
     SettingsTab: undefined;
 };
 
-// Define las pestañas del navegador superior en el perfil
 export type ProfileTabParamList = {
     MyPhotos: { title: string };
-    Lists: undefined; // No necesita params
+    Lists: undefined;
     Favorites: undefined;
 };
-
-// --- TIPOS DE PROPS PARA CADA PANTALLA ---
-// Usaremos 'CompositeScreenProps' para que las pantallas anidadas conozcan las rutas del navegador raíz.
 
 export type HomeScreenProps = CompositeScreenProps<
     BottomTabScreenProps<TabParamList, 'HomeTab'>,
@@ -66,7 +57,6 @@ export type PhotoDetailsScreenProps = NativeStackScreenProps<RootStackParamList,
 export type SaveToListScreenProps = NativeStackScreenProps<RootStackParamList, 'SaveToList'>;
 export type PhotoListDetailScreenProps = NativeStackScreenProps<RootStackParamList, 'PhotoListDetail'>;
 
-// Props para las pantallas Placeholder (pueden ser genéricas)
 export type PlaceholderScreenProps = CompositeScreenProps<
     BottomTabScreenProps<TabParamList>,
     NativeStackScreenProps<RootStackParamList>

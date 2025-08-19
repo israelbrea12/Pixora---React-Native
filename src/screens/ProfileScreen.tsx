@@ -1,11 +1,7 @@
-// src/screens/ProfileScreen.tsx
-
 import React, { Component } from 'react';
-// --- CAMBIO 1: Importamos 'Alert' para usar las alertas nativas ---
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Ionicon from 'react-native-vector-icons/Ionicons';
-import PlaceholderScreen from './PlaceholderScreen';
 import FavoritesScreen from './FavoritesScreen';
 import ListsScreen from './ListsScreen';
 import MyPhotosScreen from './MyPhotosScreen';
@@ -23,15 +19,12 @@ import i18n from '../i18n/LocalizationManager';
 
 const TopTab = createMaterialTopTabNavigator<ProfileTabParamList>();
 
-// --- Definimos los estados posibles del menú ---
 type MenuState = 'hidden' | 'main' | 'layout' | 'language';
 
-// --- CAMBIO 2: Unificamos la definición del estado del componente ---
 interface ProfileScreenState {
     menuState: MenuState;
 }
 
-// (El componente ProfileTabNavigator no cambia)
 const ProfileTabNavigator = () => (
     <TopTab.Navigator
         screenOptions={{
@@ -68,7 +61,6 @@ export default class ProfileScreen extends Component<ProfileScreenProps, Profile
 
     render() {
         return (
-            // --- CAMBIO 4: Usamos LayoutContext.Consumer para acceder al contexto de forma segura ---
             <LayoutContext.Consumer>
                 {({ layoutMode, setLayoutMode }) => {
                     const handleSelectLayoutMode = (mode: LayoutMode) => {
@@ -86,7 +78,7 @@ export default class ProfileScreen extends Component<ProfileScreenProps, Profile
                                 <View style={styles.topBarLeft} />
                                 <Text style={styles.topBarTitle}>{i18n.t('myProfile')}</Text>
                                 <View style={styles.topBarActions}>
-                                    <TouchableOpacity onPress={() => { /* TODO */ }}>
+                                    <TouchableOpacity onPress={() => { }}>
                                         <Ionicon name="person-circle-outline" size={30} color="#333" style={styles.actionIcon} />
                                     </TouchableOpacity>
                                     <Menu opened={this.state.menuState !== 'hidden'} onBackdropPress={this.closeMenu}>
@@ -102,7 +94,7 @@ export default class ProfileScreen extends Component<ProfileScreenProps, Profile
                                                             <Text style={styles.menuItemText}>{i18n.t('viewMode')}</Text>
                                                         </View>
                                                     </MenuOption>
-                                                    {/* --- CAMBIO 5: Usamos Alert.alert --- */}
+                                                    { }
                                                     <MenuOption onSelect={this.showLanguageMenu}>
                                                         <View style={styles.menuItem}>
                                                             <Ionicon name="language-outline" size={22} color="#333" />
@@ -195,6 +187,6 @@ const menuOptionsStyles = {
         borderRadius: 12,
         paddingVertical: 5,
         marginTop: 40,
-        width: 250, // Damos un ancho fijo para que se vea mejor
+        width: 250,
     },
 };

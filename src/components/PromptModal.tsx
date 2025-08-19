@@ -1,4 +1,3 @@
-// src/components/PromptModal.tsx
 import React, { useState } from 'react';
 import { Modal, View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import i18n from '../i18n/LocalizationManager';
@@ -16,7 +15,7 @@ const PromptModal = ({ visible, title, message, onCancel, onSubmit }: PromptModa
 
     const handleSubmit = () => {
         onSubmit(inputText);
-        setInputText(''); // Reseteamos el input
+        setInputText('');
     };
 
     return (

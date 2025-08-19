@@ -1,7 +1,6 @@
-// src/components/MasonryList.tsx
 import React from 'react';
 import { FlashList } from "@shopify/flash-list";
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import PhotoGridItem from './PhotoGridItem';
 import { PhotoEntry } from '../screens/PhotoList';
 

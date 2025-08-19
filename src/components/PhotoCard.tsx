@@ -3,26 +3,24 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, Dimensions } from 'rea
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import { Photo } from '../api/UnsplashApiClient';
 
-// Definimos los tipos de layout que aceptará nuestra tarjeta
 type LayoutType = 'list' | 'grid';
 
 interface PhotoCardProps {
     photo: Photo;
     onPress: () => void;
-    layout?: LayoutType; // La nueva prop para definir el layout
+    layout?: LayoutType;
 }
 
-// Hacemos que 'layout' sea 'list' por defecto si no se especifica
 const PhotoCard = ({ photo, onPress, layout = 'list' }: PhotoCardProps) => (
     <TouchableOpacity onPress={onPress} style={[
         styles.card,
-        layout === 'grid' && styles.gridCard // Aplicamos estilo extra si es grid
+        layout === 'grid' && styles.gridCard
     ]}>
         <Image
             source={{ uri: photo.urls.regular }}
             style={[
                 styles.image,
-                layout === 'grid' && styles.gridImage // Aplicamos estilo extra si es grid
+                layout === 'grid' && styles.gridImage
             ]}
         />
         <View style={styles.infoContainer}>
@@ -32,7 +30,7 @@ const PhotoCard = ({ photo, onPress, layout = 'list' }: PhotoCardProps) => (
             />
             <Text style={styles.username} numberOfLines={1}>{photo.user.name}</Text>
 
-            {/* --- LÓGICA CONDICIONAL: Mostramos los likes solo en el layout de lista --- */}
+            { }
             {layout === 'list' && (
                 <View style={styles.likesContainer}>
                     <Ionicon name="heart" size={14} color="#666" />
@@ -43,15 +41,13 @@ const PhotoCard = ({ photo, onPress, layout = 'list' }: PhotoCardProps) => (
     </TouchableOpacity>
 );
 
-const gridItemWidth = Dimensions.get('window').width / 2 - 15; // Calculamos el ancho para el grid
+const gridItemWidth = Dimensions.get('window').width / 2 - 15;
 
 const styles = StyleSheet.create({
-    // Estilo base de la tarjeta (mejorado para iOS)
     card: {
-        marginBottom: 20, // Aumentamos el margen para dar más aire
+        marginBottom: 20,
         backgroundColor: '#fff',
         borderRadius: 12,
-        // Sombra mejorada para iOS y mantenemos la elevación para Android
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.23,
@@ -89,13 +85,12 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#666',
     },
-    // --- NUEVOS ESTILOS PARA EL LAYOUT GRID ---
     gridCard: {
         width: gridItemWidth,
         marginHorizontal: 5,
     },
     gridImage: {
-        height: 180, // Hacemos la imagen un poco más pequeña para el grid
+        height: 180,
     },
 });
 

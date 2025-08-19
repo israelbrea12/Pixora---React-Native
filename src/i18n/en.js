@@ -1,4 +1,3 @@
-// src/i18n/en.js
 export default {
     // App.tsx (MainTabs & Modals)
     home: 'Home',

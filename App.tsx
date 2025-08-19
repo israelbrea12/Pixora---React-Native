@@ -1,5 +1,5 @@
 import React, { Component, useState } from 'react';
-import { View, Alert, Platform, Linking } from 'react-native';
+import { Alert, Platform, Linking } from 'react-native';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -29,9 +29,7 @@ import AddPhotoBottomSheet from './src/components/AddPhotoBottomSheet';
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 
-// El componente MainTabs no necesita cambios
 const MainTabs = () => {
-  // ... (tu código de MainTabs aquí, sin cambios)
   const [isSheetVisible, setSheetVisible] = useState(false);
   const navigation = useNavigation<any>();
 
@@ -117,10 +115,9 @@ const MainTabs = () => {
   );
 };
 
-// --- CAMBIOS EN LA CLASE APP ---
 interface AppState {
-  isDataReady: boolean;      // Para saber si los datos están listos
-  isSplashFinished: boolean; // Para saber si la animación de splash terminó
+  isDataReady: boolean;
+  isSplashFinished: boolean;
   appKey: number;
 }
 
@@ -152,7 +149,6 @@ export default class App extends Component<{}, AppState> {
     }
   }
 
-  // Esta función será llamada por InAppSplash cuando termine
   private handleSplashFinish = () => {
     this.setState({ isSplashFinished: true });
   };
@@ -161,12 +157,10 @@ export default class App extends Component<{}, AppState> {
     const { isDataReady, isSplashFinished, appKey } = this.state;
     const isAppReady = isDataReady && isSplashFinished;
 
-    // Si la app no está lista (datos Y splash), mostramos la splash
     if (!isAppReady) {
       return <InAppSplash onFinished={this.handleSplashFinish} />;
     }
 
-    // Cuando todo está listo, mostramos la app principal
     return (
       <NavigationContainer key={appKey}>
         <LayoutProvider>

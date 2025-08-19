@@ -7,6 +7,5 @@
 
 #import "React/RCTBridgeModule.h"
 
-// Tu clase debe implementar el protocolo RCTBridgeModule para ser un módulo nativo.
 @interface PhotoSaver : NSObject <RCTBridgeModule>
 @end

@@ -1,5 +1,4 @@
-// src/context/LayoutContext.tsx
-import React, { Component, createContext, PropsWithChildren } from 'react'; // Importa PropsWithChildren
+import React, { Component, createContext, PropsWithChildren } from 'react';
 import { LayoutMode, getLayoutMode, saveLayoutMode } from '../services/PreferencesManager';
 
 interface LayoutContextState {
@@ -12,7 +11,6 @@ export const LayoutContext = createContext<LayoutContextState>({
     setLayoutMode: () => { },
 });
 
-// --- CAMBIO: Usa PropsWithChildren para que acepte la prop 'children' ---
 export class LayoutProvider extends Component<PropsWithChildren<{}>, { layoutMode: LayoutMode }> {
     constructor(props: PropsWithChildren<{}>) {
         super(props);
