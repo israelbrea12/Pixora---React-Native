@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Image, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { getActivities, UserActivity } from '../services/DatabaseManager';
 import { ActivityScreenProps } from '../navigation/types';
 import i18n from '../i18n/LocalizationManager';

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, SafeAreaView } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import UnsplashApiClient, { Photo } from '../api/UnsplashApiClient';
 import { RootStackParamList } from '../navigation/types';
 import { LayoutContext } from '../context/LayoutContext';

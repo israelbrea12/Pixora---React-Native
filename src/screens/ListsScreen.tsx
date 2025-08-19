@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Image } from 'react-native';
-import { getPhotoLists, PhotoListInfo } from '../services/DatabaseManager';
+import { Text, FlatList, StyleSheet, ActivityIndicator, View } from 'react-native';
+import { getPhotoListsWithPhotos, PhotoListWithPhotos } from '../services/DatabaseManager';
 import { ListsScreenProps } from '../navigation/types';
 import i18n from '../i18n/LocalizationManager';
+import PhotoListCard from '../components/PhotoListCard';
 
 interface State {
-    lists: PhotoListInfo[];
+    lists: PhotoListWithPhotos[];
     isLoading: boolean;
 }
 
 export default class ListsScreen extends Component<ListsScreenProps, State> {
     state: State = { lists: [], isLoading: true };
-
     private focusListener: any;
 
     componentDidMount() {
@@ -26,11 +26,11 @@ export default class ListsScreen extends Component<ListsScreenProps, State> {
 
     loadLists = async () => {
         this.setState({ isLoading: true });
-        const lists = await getPhotoLists();
+        const lists = await getPhotoListsWithPhotos();
         this.setState({ lists, isLoading: false });
     };
 
-    handleListPress = (list: PhotoListInfo) => {
+    handleListPress = (list: PhotoListWithPhotos) => {
         this.props.navigation.navigate('PhotoListDetail', {
             listId: list.id,
             listName: list.name,
@@ -39,57 +39,40 @@ export default class ListsScreen extends Component<ListsScreenProps, State> {
 
     render() {
         if (this.state.isLoading) {
-            return <ActivityIndicator style={{ flex: 1, marginTop: 20 }} />;
+            return <ActivityIndicator style={styles.loader} />;
         }
 
         return (
-            <FlatList
-                data={this.state.lists}
-                keyExtractor={item => item.id.toString()}
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={styles.itemContainer}
-                        onPress={() => this.handleListPress(item)}
-                    >
-                        {item.lastPhotoUrl ? (
-                            <Image source={{ uri: item.lastPhotoUrl }} style={styles.thumbnail} />
-                        ) : (
-                            <View style={styles.placeholder} />
-                        )}
-                        <Text style={styles.itemTitle}>{item.name}</Text>
-                    </TouchableOpacity>
-                )}
-                ListEmptyComponent={<Text style={styles.emptyText}>{i18n.t('noListsYet')}</Text>}
-            />
+            <View style={styles.container}>
+                <FlatList
+                    data={this.state.lists}
+                    keyExtractor={item => item.id.toString()}
+                    numColumns={2}
+                    renderItem={({ item }) => (
+                        <PhotoListCard
+                            list={item}
+                            onPress={() => this.handleListPress(item)}
+                        />
+                    )}
+                    contentContainerStyle={styles.listContainer}
+                    ListEmptyComponent={<Text style={styles.emptyText}>{i18n.t('noListsYet')}</Text>}
+                />
+            </View>
         );
     }
 }
 
 const styles = StyleSheet.create({
-    itemContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 16,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
+    container: {
+        flex: 1,
+        backgroundColor: '#f8f8f8'
     },
-    thumbnail: {
-        width: 50,
-        height: 50,
-        borderRadius: 8,
-        backgroundColor: '#e1e4e8',
+    listContainer: {
+        padding: 8,
     },
-    placeholder: {
-        width: 50,
-        height: 50,
-        borderRadius: 8,
-        backgroundColor: '#e1e4e8',
-    },
-    itemTitle: {
-        fontSize: 17,
-        marginLeft: 16,
+    loader: {
+        flex: 1,
+        justifyContent: 'center',
     },
     emptyText: {
         textAlign: 'center',

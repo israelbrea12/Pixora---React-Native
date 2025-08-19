@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import FavoritesScreen from './FavoritesScreen';
 import ListsScreen from './ListsScreen';

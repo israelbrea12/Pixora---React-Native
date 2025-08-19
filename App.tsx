@@ -10,6 +10,7 @@ import Ionicon from 'react-native-vector-icons/Ionicons';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { check, request, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import InAppSplash from './src/components/InAppSplash';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { RootStackParamList, TabParamList } from './src/navigation/types';
 import { initLocalization, onLanguageChange } from './src/i18n/LocalizationManager';
@@ -162,21 +163,23 @@ export default class App extends Component<{}, AppState> {
     }
 
     return (
-      <NavigationContainer key={appKey}>
-        <LayoutProvider>
-          <MenuProvider>
-            <RootStack.Navigator>
-              <RootStack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
-              <RootStack.Screen name="photoDetails" component={PhotoDetailsScreen} options={{ headerShown: false }} />
-              <RootStack.Screen name="PhotoListDetail" component={PhotoListDetailScreen} />
-              <RootStack.Group screenOptions={{ presentation: 'modal' }}>
-                <RootStack.Screen name="SaveToList" component={SaveToListScreen} options={{ title: i18n.t('saveTo') }} />
-                <RootStack.Screen name="AddPhoto" component={AddPhotoScreen} options={{ title: i18n.t('newPhoto') }} />
-              </RootStack.Group>
-            </RootStack.Navigator>
-          </MenuProvider>
-        </LayoutProvider>
-      </NavigationContainer>
+      <SafeAreaProvider>
+        <NavigationContainer key={appKey}>
+          <LayoutProvider>
+            <MenuProvider>
+              <RootStack.Navigator>
+                <RootStack.Screen name="MainTabs" component={MainTabs} options={{ headerShown: false }} />
+                <RootStack.Screen name="photoDetails" component={PhotoDetailsScreen} options={{ headerShown: false }} />
+                <RootStack.Screen name="PhotoListDetail" component={PhotoListDetailScreen} />
+                <RootStack.Group screenOptions={{ presentation: 'modal' }}>
+                  <RootStack.Screen name="SaveToList" component={SaveToListScreen} options={{ title: i18n.t('saveTo') }} />
+                  <RootStack.Screen name="AddPhoto" component={AddPhotoScreen} options={{ title: i18n.t('newPhoto') }} />
+                </RootStack.Group>
+              </RootStack.Navigator>
+            </MenuProvider>
+          </LayoutProvider>
+        </NavigationContainer>
+      </SafeAreaProvider>
     );
   }
 }

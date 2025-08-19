@@ -9,6 +9,12 @@ export type PhotoListInfo = {
     lastPhotoUrl?: string;
 }
 
+export type PhotoListWithPhotos = {
+    id: number;
+    name: string;
+    photos: Photo[];
+}
+
 export type UserActivityType = 'LIKE' | 'ADD_TO_LIST';
 
 
@@ -109,6 +115,42 @@ export const getPhotoLists = (): Promise<PhotoListInfo[]> => {
     });
 };
 
+export const getPhotoListsWithPhotos = (): Promise<PhotoListWithPhotos[]> => {
+    return new Promise((resolve, reject) => {
+        db.transaction(txn => {
+            const sqlQuery = `
+                SELECT
+                    pl.id,
+                    pl.name,
+                    (
+                        SELECT json_group_array(json(le.photoData))
+                        FROM (
+                            SELECT listId, photoData FROM ListEntries
+                            WHERE listId = pl.id
+                            ORDER BY ROWID DESC
+                            LIMIT 3
+                        ) le
+                    ) AS photosData
+                FROM PhotoLists pl
+            `;
+
+            txn.executeSql(sqlQuery, [], (_, { rows }) => {
+                const lists: PhotoListWithPhotos[] = [];
+                for (let i = 0; i < rows.length; i++) {
+                    const item = rows.item(i);
+                    const photos = item.photosData ? JSON.parse(item.photosData) : [];
+
+                    lists.push({
+                        id: item.id,
+                        name: item.name,
+                        photos: photos,
+                    });
+                }
+                resolve(lists);
+            }, (_, err) => { reject(err); return false; });
+        });
+    });
+};
 
 export const addPhotoToList = (listId: number, photo: Photo, listName: string): Promise<void> => {
     return new Promise((resolve, reject) => {
