@@ -8,6 +8,7 @@ const db = SQLite.openDatabase('pixora.db', '1.0', '', 1);
 export type PhotoListInfo = {
     id: number;
     name: string;
+    lastPhotoUrl?: string;
 }
 
 // --- NUEVOS TIPOS: Para la actividad del usuario ---
@@ -75,16 +76,47 @@ export const createPhotoList = (name: string): Promise<void> => {
 export const getPhotoLists = (): Promise<PhotoListInfo[]> => {
     return new Promise((resolve, reject) => {
         db.transaction(txn => {
-            txn.executeSql('SELECT id, name FROM PhotoLists', [], (_, { rows }) => {
+            // La nueva consulta usa una subconsulta para buscar la última foto de cada lista
+            const sqlQuery = `
+                SELECT
+                    pl.id,
+                    pl.name,
+                    (SELECT le.photoData
+                     FROM ListEntries le
+                     WHERE le.listId = pl.id
+                     ORDER BY le.ROWID DESC
+                     LIMIT 1) AS lastPhotoData
+                FROM PhotoLists pl
+            `;
+
+            txn.executeSql(sqlQuery, [], (_, { rows }) => {
                 const lists: PhotoListInfo[] = [];
                 for (let i = 0; i < rows.length; i++) {
-                    lists.push(rows.item(i));
+                    const item = rows.item(i);
+                    let lastPhotoUrl: string | undefined = undefined;
+
+                    // Si encontramos datos de una foto, los parseamos para extraer la URL
+                    if (item.lastPhotoData) {
+                        try {
+                            const photo: Photo = JSON.parse(item.lastPhotoData);
+                            lastPhotoUrl = photo.urls.thumb; // Usamos el thumbnail
+                        } catch (e) {
+                            console.error("Error parsing last photo data:", e);
+                        }
+                    }
+
+                    lists.push({
+                        id: item.id,
+                        name: item.name,
+                        lastPhotoUrl: lastPhotoUrl, // Añadimos la URL al objeto
+                    });
                 }
                 resolve(lists);
             }, (_, err) => { reject(err); return false; });
         });
     });
 };
+
 
 export const addPhotoToList = (listId: number, photo: Photo, listName: string): Promise<void> => {
     return new Promise((resolve, reject) => {
