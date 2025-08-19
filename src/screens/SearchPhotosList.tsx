@@ -10,6 +10,9 @@ interface SearchablePhotoListState extends PhotoListState {
 }
 
 export default class SearchPhotosList extends PhotoList<SearchScreenProps, SearchablePhotoListState> {
+
+    protected listLayout: 'list' | 'grid' = 'grid';
+
     public state: SearchablePhotoListState = {
         photos: [],
         query: '',

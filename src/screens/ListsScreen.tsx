@@ -1,11 +1,7 @@
 // src/screens/ListsScreen.tsx
 import React, { Component } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import { getPhotoLists, PhotoListInfo } from '../services/DatabaseManager';
-import { CompositeScreenProps } from '@react-navigation/native';
-import { MaterialTopTabScreenProps } from '@react-navigation/material-top-tabs';
-import { ProfileTabParamList, RootStackParamList } from '../navigation/types';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ListsScreenProps } from '../navigation/types';
 import i18n from '../i18n/LocalizationManager';
 
@@ -52,13 +48,18 @@ export default class ListsScreen extends Component<ListsScreenProps, State> {
             <FlatList
                 data={this.state.lists}
                 keyExtractor={item => item.id.toString()}
+                // 2. Modifica el renderItem para que muestre la imagen o el placeholder
                 renderItem={({ item }) => (
-                    // --- CAMBIO: Hacemos el TouchableOpacity funcional ---
                     <TouchableOpacity
-                        style={styles.item}
+                        style={styles.itemContainer}
                         onPress={() => this.handleListPress(item)}
                     >
-                        <Text style={styles.itemText}>{item.name}</Text>
+                        {item.lastPhotoUrl ? (
+                            <Image source={{ uri: item.lastPhotoUrl }} style={styles.thumbnail} />
+                        ) : (
+                            <View style={styles.placeholder} />
+                        )}
+                        <Text style={styles.itemTitle}>{item.name}</Text>
                     </TouchableOpacity>
                 )}
                 ListEmptyComponent={<Text style={styles.emptyText}>{i18n.t('noListsYet')}</Text>}
@@ -68,7 +69,35 @@ export default class ListsScreen extends Component<ListsScreenProps, State> {
 }
 
 const styles = StyleSheet.create({
-    item: { padding: 20, borderBottomWidth: 1, borderBottomColor: '#eee' },
-    itemText: { fontSize: 18 },
-    emptyText: { textAlign: 'center', marginTop: 50, fontSize: 16, color: 'gray' },
+    itemContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        backgroundColor: '#fff', // Un fondo blanco para cada item
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
+    },
+    thumbnail: {
+        width: 50,
+        height: 50,
+        borderRadius: 8,
+        backgroundColor: '#e1e4e8',
+    },
+    placeholder: {
+        width: 50,
+        height: 50,
+        borderRadius: 8,
+        backgroundColor: '#e1e4e8',
+    },
+    itemTitle: {
+        fontSize: 17,
+        marginLeft: 16,
+    },
+    emptyText: {
+        textAlign: 'center',
+        marginTop: 50,
+        fontSize: 16,
+        color: 'gray',
+    },
 });

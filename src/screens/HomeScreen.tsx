@@ -22,6 +22,9 @@ interface HomeState extends PhotoListState {
 
 // --- CAMBIO 2: Le decimos a la clase que usará HomeScreenProps ---
 export default class HomeScreen extends PhotoList<HomeScreenProps, HomeState> {
+
+    protected listLayout: 'list' | 'grid' = 'grid';
+
     public state: HomeState = {
         photos: [],
         selectedCategory: CATEGORIES[0].key,

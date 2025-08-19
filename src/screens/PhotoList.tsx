@@ -83,6 +83,7 @@ export default abstract class PhotoList<
     }
 
     protected abstract loadPage(page: number): Promise<{ photos: ReadonlyArray<Photo>, totalPages: number }>;
+    protected listLayout: 'list' | 'grid' = 'list';
 
     public render() {
         return (
@@ -104,6 +105,7 @@ export default abstract class PhotoList<
                                     onEndReached={this.loadNextPage}
                                     onPhotoPress={this.onPhotoPressed}
                                     isLoading={this.loading}
+                                    layout={this.listLayout}
                                 />
                             )}
                         </View>
